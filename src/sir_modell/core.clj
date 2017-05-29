@@ -35,25 +35,24 @@
   ;
   ;;(write-to-file res :R "data/results.dat")
   ;---------------------------------------------------------------------------------------------
-  (with-primitive-procedures [geometric]
+  (with-primitive-procedures [geometric new-infections]
    (defquery  sir []
     (let
     ; Starting point for a node at some point in time
      [N 700000
       I0 300
-      transmission-prob 0.3
+      ; transmission-prob 0.3
+      ; exposed (encounters [3 0.5])
+      ; infected (S2I [exposed transmission-prob])
       susceptible (N2S [700000 0.3])
-      exposed (encounters [3 0.5])
-      infected (S2I [exposed transmission-prob])
-      drop-outs (multinomial [infected [0.3 0.4 0.2 0.1]])
-      testparam (sample (beta 1 1))]
-     (observe* (geometric testparam) 3)
+      ;drop-outs (multinomial [infected [0.3 0.4 0.2 0.1]])
+      testparam (sample (new-infections 2 50))]
+     ;(observe* (geometric testparam) 3)
      ;(map #(observe (geometric testparam %) [2 3 2 2 5 3 5 6]))
      ; This was not a process yet but only an estimation of the numbers that go into the
      ; process. The Process itself starts now.
-     ;course (I2R [1 2 3])]
 
-     {:S susceptible, :E exposed :I infected :drops drop-outs :testparam testparam})))
+     {:S susceptible, :testparam testparam})))
 
 
 
@@ -66,7 +65,7 @@
     "cos" (map #(Math/cos %) (range 0.0 6.0 0.2))})
 
 
-  (def e (extract-result res :E))
+  (def e (extract-result res :S))
   ;(proto-repl-charts.charts/bar-chart "chart" {"E"  [3 4 5 3]})
   (frequencies e)
   (proto-repl-charts.charts/bar-chart "chart" (from-frequencies (frequencies e) 1)) :labels (from-frequencies (frequencies e) 0))
