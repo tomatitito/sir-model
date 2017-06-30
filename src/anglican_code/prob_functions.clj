@@ -44,24 +44,11 @@
     (= hits r) trials
     (negative-binomial [r p (inc trials) (+ hits (sample (bernoulli p)))])))
 
-(defn geometric-recursion [ [p acc]]
-  (if (sample* (flip p)) acc
-    (geometric-recursion [p (inc acc)])))
-
-(defdist geometric
-  "Geometric distribution. Returns the number of misses up to and not including
-  the first success."
-  [p] []
-  (sample* [this] (geometric-recursion [p 0]))
-  (observe* [this value]
-    (let [unpacked (repeat value 0)]
-     (map #(observe* (bernoulli p) %) unpacked))))
 
 
 (defdist location [pub-preference] []
   (sample* [this] (if (sample* (flip pub-preference)) :pub :starbucks))
   (observe* [this value] (observe* (flip pub-preference) (= value :pub))))
-
 
 
 
@@ -122,13 +109,3 @@
 
 (defm I2I
   "With each timestep some of the infected will stay infected.")
-
-(defdist new-infections
- "Distribution of new-infections. The number of new infections depends on the number of
- already infected people. An infected individual transmits the disease to some number of
- individuals. Parameters to this distribution are R0, the basic reproduction number and
- the number of already infected individuals (prevalence). R0 is conceptualized as a geometric
- random variable."
- [R0 already-infected] []
- (sample* [this] (reduce + (repeatedly already-infected #(sample* (geometric (/ 1 R0))))))
- (observe* [this value] value))
