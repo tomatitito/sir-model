@@ -20,9 +20,17 @@
   )
 
 
-;; Add a watch to every element of the I-counter map. This is used to
-;; check if new infections can be computed.
-;(dotimes [i timesteps]
-;  (let [watch-key (keyword (str "I-count-" i))
-;        ref-in-I-counter ((keyword (str i)) I-counter)]
-;    (add-watch ref-in-I-counter watch-key watch-test-fn)))
+;NEED THIS?
+;(defprotocol Compartment
+;  "Represents a compartment in SIR-Model, which is a map with an entry for each timestep."
+;  (update-value [this timestep updating-value]))
+;
+;
+;(defrecord I-map [infections-per-timestep-map]
+;  Compartment
+;  (update-value [this timestep new-infections]
+;    (let [current-infections (get infections-per-timestep-map (keyword (str timestep)))]
+;      (+ current-infections new-infections))))
+
+(defrecord cohort [S-map I-map I-counter-map R-map R-0 recovery-rate timestep])
+

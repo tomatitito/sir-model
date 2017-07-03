@@ -21,16 +21,19 @@
   (def timesteps 20)
   (def cur-infs 300)
   (def rec-rate 0.4)
+
+  (def S (ref-type-map ref timesteps))
   (def I (ref-type-map ref timesteps))
   (def R (ref-type-map ref timesteps))
 
-
   (def I-counter (create-I-counter {} timesteps watch-test-fn))
 
-  (cohort cur-infs rec-rate I I-counter R 0 timesteps)
-  (print-infections-in-cohort I)
-  ;(print-infections-in-cohort I-counter)
-  (print-infections-in-cohort R)
+  (def coh-0 (sir-modell.datastructures/->cohort S I I-counter R 3 rec-rate 0) )
+  ;
+  ;(cohort-progression cur-infs rec-rate I I-counter R 0 timesteps)
+  ;(print-infections-in-cohort I)
+  ;;(print-infections-in-cohort I-counter)
+  ;(print-infections-in-cohort R)
 
   )
 
