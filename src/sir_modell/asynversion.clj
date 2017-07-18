@@ -21,6 +21,17 @@
        )
      channel-map)))
 
+(defn compartment-channels
+  "Creates a map of length timesteps with each entry being a map holding a channel. Used to
+  synchronize access to compartments."
+  ([timesteps] (compartment-channels timesteps {}))
+  ([timesteps channel-map]
+    (if (pos? timesteps)
+      (let [ts-key (keyword (str timesteps))
+            comp-c (chan 1)]
+        (compartment-channels (dec timesteps) (assoc channel-map ts-key comp-c)))
+      channel-map)))
+
 (defn progression
   "Takes a timestep, max number of timesteps and number of infected and begins progression."
   [t-cur t-max n-inf I-channel-for-t R-channel-for-t recovery-par]
