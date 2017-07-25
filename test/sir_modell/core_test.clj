@@ -1,8 +1,10 @@
 (ns sir-modell.core-test
   (:require [clojure.test :refer :all]
-            [sir-modell.core :refer :all])
+            [sir-modell.core :refer :all]
+            [clojure.core.async :as as])
   (:use [anglican runtime [core :exclude [-main]] emit]
-        anglican-code.distributions))
+        anglican-code.distributions
+        ))
 
 (deftest a-test
   (testing "FIXME, I fail."
@@ -25,18 +27,6 @@
   "Wrapper around geometric-recursion-tuple and trials-until-success. Samples N times
   from geometric distribution and returns a vector of length N with each entry being
   the number of trials up to and including the first success."
-  ;(letfn [(geometric-recursion-tuple
-  ;          "Sample from geometric distribution and collect results in vector"
-  ;          [p acc]
-  ;          (let [res (sample* (flip p))]
-  ;            (if res
-  ;              (conj acc true)
-  ;              (geometric-recursion-tuple p (conj acc res)))))
-          ;(trials-until-success
-          ;  "Count trials including first success from vector as returned by geometric-recursion-tuple"
-          ;  [outcome-vec]
-          ;  (count outcome-vec))
-          ;]
     (if (= N 0)
       acc
       (run-geometric p (dec N) (conj acc (trials-until-success (geometric-recursion-tuple p []))))))
@@ -58,3 +48,21 @@
     (is (= (float actual) expected))
     )
   )
+
+(deftest test-update-S
+  (testing "update-S..."
+    (let [s (sir-modell.asynversion/->SIR-Compartments 0 (sir-modell.asynversion/->I-compartment 0 3 (as/chan)) 0)
+          x 42]
+      (is (= (- x) (:S (sir-modell.asynversion/update-S x s)))))))
+
+(deftest test-update-I
+    (let [timesteps 3
+          already-inf 100
+          still-inf 20
+          s (sir-modell.asynversion/->SIR-Compartments 0 (sir-modell.asynversion/->I-compartment already-inf 0 (as/chan)) timesteps)
+          ]
+      (testing "update-I..."
+        (is
+          (= (+ already-inf still-inf) (get-in (sir-modell.asynversion/update-I still-inf s) [:I :infected]))
+          (= (dec timesteps) (get-in (sir-modell.asynversion/update-I still-inf s) [:I :countdown]))
+          ))))

@@ -92,20 +92,22 @@
    (multinom-recursive [n probabilities []]))
 
 
-(defm I2R
-  "As time progresses, with each unit of time a certain number of infected recover. The
-  first entry in list-of-probabilities is the probability that an individual recovers
-  after 1 unit of time, the second entry is the probability for recovering after 2 timesteps
-  etc. Each recovery-parameters is the parameter for a binomially distributed rv. A sample
-  from binomial with number-infected and first recovery parameter is taken. Then the data
-  for new infections for current timesteps is taken to estimate this parameter (via an
-  observe-statement). In the next timestep, number-infected - recovered and the next recovery
-  parameter are used and so on. The estimated parameters have to be made accessible for the
-  next node."
-  [[number-infected recovery-parameters]])
+(defn I2R
+      "As time progresses, with each unit of time a certain number of infected recover. The
+      first entry in list-of-probabilities is the probability that an individual recovers
+      after 1 unit of time, the second entry is the probability for recovering after 2 timesteps
+      etc. Each recovery-parameters is the parameter for a binomially distributed rv. A sample
+      from binomial with number-infected and first recovery parameter is taken. Then the data
+      for new infections for current timesteps is taken to estimate this parameter (via an
+      observe-statement). In the next timestep, number-infected - recovered and the next recovery
+      parameter are used and so on. The estimated parameters have to be made accessible for the
+      next node."
+      [[number-infected recovery-parameters]]
+      (sample* (binomial number-infected recovery-parameters)))
 
 (defm I2D
-  "With each timestep some if the infected will die.")
+"With each timestep some if the infected will die.")
 
 (defm I2I
   "With each timestep some of the infected will stay infected.")
+

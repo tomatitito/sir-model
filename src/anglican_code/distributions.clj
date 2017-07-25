@@ -26,3 +26,5 @@
   [R0 already-infected] []
   (sample* [this] (reduce + (repeatedly already-infected #(sample* (geometric (/ 1 R0))))))
   (observe* [this value] (observe* (reduce + (repeatedly already-infected #(geometric (/ 1 R0)))) value)))
+
+

@@ -2,12 +2,15 @@
   (:gen-class)
   (:require [clojure.java.io :as io]
             [clojure.data.csv :as csv]
-            [util.functions :as util])
+            [util.functions :as util]
+            [clojure.core.async :as a]
+            )
   (:use [anglican [core :exclude [-main]] runtime emit stat]
         [anglican-code prob_functions distributions queries]
         sir-modell.functions
         sir-modell.datastructures
         util.functions
+        sir-modell.asynversion
     ;proto-repl-charts.charts
         ))
 
@@ -18,22 +21,36 @@
   "Probabilistisches SIR-Modell"
   [& args]
 
-  (def timesteps 20)
-  (def cur-infs 300)
-  (def rec-rate 0.4)
+  ;create an instance of SIR-Compartments
+  (def s (->SIR-Compartments 100 (->I-compartment 50 0 (a/chan)) 0))
+  ;(assoc s :S (+ 42 (:S s)))
 
-  (def S (ref-type-map ref timesteps))
-  (def I (ref-type-map ref timesteps))
-  (def R (ref-type-map ref timesteps))
 
-  (def I-counter (create-I-counter {} timesteps watch-test-fn))
+  (def sc (sync-channels 4))
 
-  (def coh-0 (sir-modell.datastructures/->cohort S I I-counter R 3 rec-rate 0) )
-  ;
-  ;(cohort-progression cur-infs rec-rate I I-counter R 0 timesteps)
-  ;(print-infections-in-cohort I)
-  ;;(print-infections-in-cohort I-counter)
-  ;(print-infections-in-cohort R)
+  (a/go
+    (a/>! (get sc :2) (update-IR 43 47 (a/<! (get sc :2))))
 
+    (a/take! (get sc :2) println)
+    )
+
+
+  ;(defn mod-and-print [some-par sir-rec]
+  ;  (println (update-R 42 (update-infected some-par (countdown sir-rec)))))
+
+  ;(a/put! (get sc :2)
+  ;        (a/go
+  ;          (a/take! (get sc :2) (fn [x] (mod-and-print 43 x)))))
+
+
+  ;(progression2 1 5 100 sc 0.4)
+  ;(a/take! (get sc :1) println)
+  ;(a/go (a/<! (get sc :1)))
+  ;(progression2 2 3 (a/take! (get sc :2) println) sc 0.4)
+  ;(progression2 3 3 (a/take! (get sc :3) println) sc 0.4)
+
+  ;(a/go
+  ;  (a/>! (get Cs :1) 43)
+  ;  (a/take! (get Cs :1) println))
   )
 
