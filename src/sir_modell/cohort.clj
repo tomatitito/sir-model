@@ -1,4 +1,4 @@
-(ns sir-modell.asynversion
+(ns sir-modell.cohort
   (:require [clojure.core.async
              :as as
              :refer [<! <!! >! >!! take! put! pipe go chan buffer close! thread alts! alts!! alt! timeout]]

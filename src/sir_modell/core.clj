@@ -10,7 +10,7 @@
         sir-modell.functions
         sir-modell.datastructures
         util.functions
-        sir-modell.asynversion
+        sir-modell.cohort
     ;proto-repl-charts.charts
         ))
 

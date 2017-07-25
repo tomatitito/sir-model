@@ -51,18 +51,18 @@
 
 (deftest test-update-S
   (testing "update-S..."
-    (let [s (sir-modell.asynversion/->SIR-Compartments 0 (sir-modell.asynversion/->I-compartment 0 3 (as/chan)) 0)
+    (let [s (sir-modell.cohort/->SIR-Compartments 0 (sir-modell.cohort/->I-compartment 0 3 (as/chan)) 0)
           x 42]
-      (is (= (- x) (:S (sir-modell.asynversion/update-S x s)))))))
+      (is (= (- x) (:S (sir-modell.cohort/update-S x s)))))))
 
 (deftest test-update-I
     (let [timesteps 3
           already-inf 100
           still-inf 20
-          s (sir-modell.asynversion/->SIR-Compartments 0 (sir-modell.asynversion/->I-compartment already-inf 0 (as/chan)) timesteps)
+          s (sir-modell.cohort/->SIR-Compartments 0 (sir-modell.cohort/->I-compartment already-inf 0 (as/chan)) timesteps)
           ]
       (testing "update-I..."
         (is
-          (= (+ already-inf still-inf) (get-in (sir-modell.asynversion/update-I still-inf s) [:I :infected]))
-          (= (dec timesteps) (get-in (sir-modell.asynversion/update-I still-inf s) [:I :countdown]))
+          (= (+ already-inf still-inf) (get-in (sir-modell.cohort/update-I still-inf s) [:I :infected]))
+          (= (dec timesteps) (get-in (sir-modell.cohort/update-I still-inf s) [:I :countdown]))
           ))))
