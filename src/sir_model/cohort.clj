@@ -83,10 +83,8 @@
   Compartment."
   [still-infected removed sir-record]
   (->> sir-record
-       ;(println)
        (update-R removed)
-       (update-I still-infected)
-       ))
+       (update-I still-infected) ))
 
 
 (defn progression2

@@ -174,12 +174,12 @@ sir-modell.core=>
 Loading File /home/dusty/hlrs/dev-clojure/sir-modell/src/anglican_code/prob_functions.clj
 sir-modell.core=>
 #'anglican-code.prob_functions/I2R
-Loading File /home/dusty/hlrs/dev-clojure/sir-modell/src/sir_modell/core.clj
+Loading File /home/dusty/hlrs/dev-clojure/sir-modell/src/sir_model/core.clj
 sir-modell.core=>
 #'sir-modell.core/-main
 (-main)
 IllegalArgumentException Don't know how to create ISeq from: clojure.lang.Ratio  clojure.lang.RT.seqFrom (RT.java:542)
-Loading File /home/dusty/hlrs/dev-clojure/sir-modell/src/sir_modell/core.clj
+Loading File /home/dusty/hlrs/dev-clojure/sir-modell/src/sir_model/core.clj
 sir-modell.core=>
 #'sir-modell.core/-main
 (-main)
