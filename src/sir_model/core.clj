@@ -1,4 +1,4 @@
-(ns sir-modell.core
+(ns sir-model.core
   (:gen-class)
   (:require [clojure.java.io :as io]
             [clojure.data.csv :as csv]
@@ -7,14 +7,10 @@
             )
   (:use [anglican [core :exclude [-main]] runtime emit stat]
         [anglican-code prob_functions distributions queries]
-        sir-modell.functions
-        sir-modell.datastructures
         util.functions
-        sir-modell.cohort
+        sir-model.cohort
     ;proto-repl-charts.charts
         ))
-
-;Setting up data structures. Maybe do this functionally?
 
 
 (defn -main
