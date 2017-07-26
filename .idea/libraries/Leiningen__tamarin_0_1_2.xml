@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: tamarin:0.1.2">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/tamarin/tamarin/0.1.2/tamarin-0.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
