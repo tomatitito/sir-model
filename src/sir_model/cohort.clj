@@ -9,39 +9,33 @@
 
 
 
+(defn I2R
+  "As time progresses, with each unit of time a certain number of infected recover."
+  [number-infected recovery-parameters]
+  (sample* (binomial number-infected recovery-parameters)))
 
 (defn progress
-  "Takes a timestep, max number of timesteps and number of infected and begins progression."
-  [t-cur t-max n-inf sync-chans recovery-param]
+  "Progression of a cohort. Returns the compartments-map when progression finishes."
+  [t-cur t-max n-inf compartments-map recovery-param]
   (loop [t t-cur
-         cases n-inf]
+         cases n-inf
+         compartments compartments-map]
 
-    (when (< t t-max)
-      (println "Schleife:" t)
+    (if (and (< t t-max) (pos? cases))
+      (do
+        ;for debugging
+        (println "Schleife:" t)
 
-      (let
-        [sync-chan (get sync-chans (keyword (str t)))
-         still-inf (- cases 1)
-         removed 1 ]
+        (let
+          [removed (I2R n-inf recovery-param)
+           still-inf (- cases removed)
+           updated-compartments (update-in compartments-map [(keyword (str t))] #(compartments/update-IR still-inf removed %))]
 
-        ;(put! sync-chan (go (<! sync-chan (fn [x] (update-infected still-inf x)))))
-        (go (>! sync-chan (compartments/update-IR still-inf removed (<! sync-chan))))
-        (println "nach Schleife: " t)
+          ;for debugging
+          (println "nach Schleife: " t)
 
-        (recur (inc t) (- cases still-inf))))))
-
-
-(defn progression
-  "Takes a timestep, max number of timesteps and number of infected and begins progression."
-  [t-cur t-max n-inf I-channel-for-t R-channel-for-t recovery-par]
-  (go
-    (loop [t t-cur
-           cases n-inf]
-      (when (< t t-max)
-
-        (let [still-inf (I2R [cases recovery-par])
-              rec (- cases still-inf)]
-          (println "Schleife:" t)
-          (>! I-channel-for-t rec)
-          (>! R-channel-for-t still-inf)
-          (recur (inc t) (- cases still-inf)))))))
+          (recur
+            (inc t)
+            still-inf
+            updated-compartments)))
+      compartments)))

@@ -19,11 +19,11 @@
   [& args]
 
   ;create an instance of SIR-Compartments
-  (def s (->SIR-Compartments 100 (->I-compartment 50 0 (a/chan)) 0))
+  (def s (->SIR-Compartments 100 21 42))
   ;(assoc s :S (+ 42 (:S s)))
 
 
-  (def sc (sync-channels 4))
+  (def sc (create-compartments-map 4))
 
   ;(a/go
   ;  (a/>! (get sc :2) (update-IR 43 47 (a/<! (get sc :2))))
