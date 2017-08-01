@@ -20,18 +20,11 @@
 
   ;create an instance of SIR-Compartments
   (def s (->SIR-Compartments 100 21 42))
-  ;(assoc s :S (+ 42 (:S s)))
 
-
+  ;create a compartments-map
   (def sc (create-compartments-map 4))
 
-  ;(a/go
-  ;  (a/>! (get sc :2) (update-IR 43 47 (a/<! (get sc :2))))
-  ;
-  ;  (a/take! (get sc :2) println)
-  ;  )
-
-
+  ;progression of a cohort
   (progress 1 5 100 sc 0.4)
   )
 
