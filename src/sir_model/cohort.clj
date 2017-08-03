@@ -14,28 +14,39 @@
   [number-infected recovery-parameters]
   (sample* (binomial number-infected recovery-parameters)))
 
+
+(defn commpute-still-infected [cases removed]
+  "Make sure that number of still infected is not bigger than number of cases."
+  (if (< cases removed)
+    cases
+    (- cases removed)))
+
+
+(defn start-cohort
+  [t-cur compartments-map R-0]
+  (let [already-inf (get-in compartments-map [(keyword (str t-cur)) :I])
+        new-inf (get-in (first (take 1 (doquery :smc new-infections-model [R-0 already-inf]))) [:result :new-infections])]
+    (println new-inf)
+    (update-in compartments-map [(keyword (str t-cur))] #(compartments/update-SI new-inf %))
+    ))
+
 (defn progress
   "Progression of a cohort. Returns the compartments-map when progression finishes."
   [t-cur t-max n-inf compartments-map recovery-param]
-  (loop [t t-cur
+  (loop [t (inc t-cur)
          cases n-inf
          compartments compartments-map]
 
-    (if (and (< t t-max) (pos? cases))
-      (do
-        ;for debugging
-        (println "Schleife:" t)
+    (if (or (>= t t-max) (not (pos? cases)))
+      compartments
 
-        (let
-          [removed (I2R n-inf recovery-param)
-           still-inf (- cases removed)
-           updated-compartments (update-in compartments-map [(keyword (str t))] #(compartments/update-IR still-inf removed %))]
+      (let
+        [removed (I2R n-inf recovery-param)
+         still-inf (commpute-still-infected cases removed)
+         updated-compartments (update-in compartments [(keyword (str t))] #(compartments/update-IR still-inf removed %)) ]
 
-          ;for debugging
-          (println "nach Schleife: " t)
-
-          (recur
-            (inc t)
-            still-inf
-            updated-compartments)))
-      compartments)))
+        (recur
+          (inc t)
+          still-inf
+          updated-compartments
+          )))))

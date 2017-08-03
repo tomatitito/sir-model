@@ -24,7 +24,13 @@
   ;create a compartments-map
   (def sc (create-compartments-map 4))
 
+  ;initially infected and susceptible
+  (def sc (assoc-in sc [:1 :I] 100))
+  (def sc (assoc-in sc [:1 :S] 1000))
+
+  (println sc)
+
   ;progression of a cohort
-  (progress 1 5 100 sc 0.4)
+  (progress 1 5 100  (start-cohort 1 sc 3) 0.4)
   )
 

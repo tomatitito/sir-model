@@ -30,8 +30,16 @@
   (assoc-in sir-record [:I ] (+ (:I sir-record) still-infected)))
 
 
+(defn update-SI
+  "Wraps update-S and update-I, because those functions are called at the start of a cohort."
+  [new-inf sir-record]
+  (->> sir-record
+       (update-S new-inf)
+       (update-I new-inf)))
+
+
 (defn update-IR
-  "Wrapps update-I and update-R, because those functions are alway called together."
+  "Wrapps update-I and update-R, because those functions are called together during progression of a cohort."
   [still-infected removed sir-record]
   (->> sir-record
        (update-R removed)
