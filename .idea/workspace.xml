@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f3caad09-b4ea-4c12-ad17-8fe60ccbce5d" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/project.clj" afterPath="$PROJECT_DIR$/project.clj" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/sir_model/cohort.clj" afterPath="$PROJECT_DIR$/src/sir_model/cohort.clj" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/sir_model/cohort_test.clj" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/sir_model/compartments.clj" afterPath="$PROJECT_DIR$/src/sir_model/compartments.clj" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/sir_model/core.clj" afterPath="$PROJECT_DIR$/src/sir_model/core.clj" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,11 +17,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="core.clj" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/sir_model/core.clj">
+      <file leaf-file-name="compartments.clj" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/sir_model/compartments.clj">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+            <state relative-caret-position="360">
+              <caret line="24" column="41" lean-forward="false" selection-start-line="24" selection-start-column="41" selection-end-line="24" selection-end-column="41" />
               <folding />
             </state>
           </provider>
@@ -42,7 +42,9 @@
       <list>
         <option value="$PROJECT_DIR$/project.clj" />
         <option value="$PROJECT_DIR$/src/sir_model/cohort.clj" />
+        <option value="$PROJECT_DIR$/src/sir_model/compartments.clj" />
         <option value="$PROJECT_DIR$/src/sir_model/core.clj" />
+        <option value="$PROJECT_DIR$/test/sir_model/cohort_test.clj" />
       </list>
     </option>
   </component>
@@ -53,10 +55,9 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1975" />
-    <option name="y" value="40" />
-    <option name="width" value="1717" />
-    <option name="height" value="987" />
+    <option name="y" value="27" />
+    <option name="width" value="1920" />
+    <option name="height" value="1053" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -73,7 +74,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -83,6 +86,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="sir-model" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sir-model" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sir-model" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sir_model" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -120,8 +141,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -131,8 +150,9 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="cursive.last.file.extension./home/dusty/sir-model/test" value="clj" />
   </component>
-  <component name="ReplState" timestamp="1501087438550">{:repl-history {:ide [], :local [{:command &quot;(ns sir-model.core)&quot;, :offset 19, :ns &quot;sir-modell.core&quot;} {:command &quot;(ns-interns sir-model.core)&quot;, :offset 27, :ns &quot;sir-model.core&quot;} {:command &quot;(ns-interns *ns*)&quot;, :offset 17, :ns &quot;sir-model.core&quot;} {:command &quot;(-main)&quot;, :offset 7, :ns &quot;sir-model.core&quot;}], :remote []}}</component>
+  <component name="ReplState" timestamp="1501792031401">{:repl-history {:ide [], :local [{:command &quot;(ns sir-model.core)&quot;, :offset 19, :ns &quot;sir-modell.core&quot;} {:command &quot;(ns-interns sir-model.core)&quot;, :offset 27, :ns &quot;sir-model.core&quot;} {:command &quot;(ns-interns *ns*)&quot;, :offset 17, :ns &quot;sir-model.core&quot;} {:command &quot;(-main)&quot;, :offset 7, :ns &quot;sir-model.core&quot;}], :remote []}}</component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -582,20 +602,22 @@
       <workItem from="1501083124748" duration="247000" />
       <workItem from="1501083409515" duration="221000" />
       <workItem from="1501083663828" duration="1434000" />
+      <workItem from="1501756171257" duration="2640000" />
+      <workItem from="1501788716506" duration="3313000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3127000" />
+    <option name="totallyTimeSpent" value="9080000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1975" y="40" width="1717" height="987" extended-state="0" />
+    <frame x="0" y="27" width="1920" height="1053" extended-state="6" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="REPL" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32964474" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="REPL" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32916668" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" x="1288" y="67" width="632" height="685" />
       <window_info id="Leiningen" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -613,7 +635,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31217238" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31197917" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -639,6 +661,31 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/sir_model/cohort.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="705">
+          <caret line="47" column="109" lean-forward="false" selection-start-line="47" selection-start-column="109" selection-end-line="47" selection-end-column="109" />
+          <folding>
+            <marker date="1501758018242" expanded="true" signature="0:368" ph="(ns sir-model.cohort ...)" />
+            <marker date="1501758018242" expanded="true" signature="372:566" ph="(defn I2R ...)" />
+            <marker date="1501758018242" expanded="true" signature="569:752" ph="(defn commpute-still-infected ...)" />
+            <marker date="1501758018242" expanded="true" signature="755:1122" ph="(defn start-cohort ...)" />
+            <marker date="1501758018242" expanded="true" signature="1125:1852" ph="(defn progress ...)" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/sir_model/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding>
+            <marker date="1501791861409" expanded="true" signature="0:442" ph="(ns sir-model.core ...)" />
+            <marker date="1501791861409" expanded="true" signature="445:899" ph="(defn -main ...)" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/project.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
@@ -653,7 +700,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="10" column="16" lean-forward="false" selection-start-line="10" selection-start-column="16" selection-end-line="10" selection-end-column="16" />
-          <folding />
+          <folding>
+            <marker date="1501791861409" expanded="true" signature="0:442" ph="(ns sir-model.core ...)" />
+            <marker date="1501791861409" expanded="true" signature="445:899" ph="(defn -main ...)" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -661,7 +711,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="10" column="16" lean-forward="false" selection-start-line="10" selection-start-column="16" selection-end-line="10" selection-end-column="16" />
-          <folding />
+          <folding>
+            <marker date="1501791861409" expanded="true" signature="0:442" ph="(ns sir-model.core ...)" />
+            <marker date="1501791861409" expanded="true" signature="445:899" ph="(defn -main ...)" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -675,34 +728,59 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/sir_model/cohort.clj">
+    <entry file="file://$PROJECT_DIR$/test/sir_model/compartments_test.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="12" lean-forward="false" selection-start-line="0" selection-start-column="12" selection-end-line="0" selection-end-column="12" />
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1501084426350" expanded="true" signature="0:313" ph="(ns sir-model.cohort ...)" />
-            <marker date="1501084426350" expanded="true" signature="316:684" ph="(defn create-I-map ...)" />
-            <marker date="1501084426350" expanded="true" signature="687:794" ph="(defn create-sir-comp ...)" />
-            <marker date="1501084426350" expanded="true" signature="797:856" ph="(defrecord I-compartment ...)" />
-            <marker date="1501084426350" expanded="true" signature="859:898" ph="(defrecord SIR-Compartments ...)" />
-            <marker date="1501084426350" expanded="true" signature="901:1592" ph="(defn sync-channels ...)" />
-            <marker date="1501084426350" expanded="true" signature="1594:1683" ph="(defn update-S ...)" />
-            <marker date="1501084426350" expanded="true" signature="1685:1774" ph="(defn update-R ...)" />
-            <marker date="1501084426350" expanded="true" signature="1776:1850" ph="(defn countdown ...)" />
-            <marker date="1501084426350" expanded="true" signature="1852:1988" ph="(defn update-infected ...)" />
-            <marker date="1501084426350" expanded="true" signature="1990:2241" ph="(defn notify-cohort ...)" />
-            <marker date="1501084426350" expanded="true" signature="2243:2389" ph="(defn update-I ...)" />
-            <marker date="1501084426350" expanded="true" signature="2391:2819" ph="(defn update-IR ...)" />
-            <marker date="1501084426350" expanded="true" signature="2822:3363" ph="(defn progression2 ...)" />
-            <marker date="1501084426350" expanded="true" signature="3366:3868" ph="(defn progression ...)" />
+            <marker date="1501582273492" expanded="true" signature="0:121" ph="(ns sir-model.compartments-test ...)" />
+            <marker date="1501582273492" expanded="true" signature="123:271" ph="(with-test ...)" />
+            <marker date="1501582273492" expanded="true" signature="274:374" ph="(with-test ...)" />
+            <marker date="1501582273492" expanded="true" signature="376:573" ph="(with-test ...)" />
+            <marker date="1501582273492" expanded="true" signature="576:707" ph="(with-test ...)" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/sir_model/cohort.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="705">
+          <caret line="47" column="109" lean-forward="false" selection-start-line="47" selection-start-column="109" selection-end-line="47" selection-end-column="109" />
+          <folding>
+            <marker date="1501758018242" expanded="true" signature="0:368" ph="(ns sir-model.cohort ...)" />
+            <marker date="1501758018242" expanded="true" signature="372:566" ph="(defn I2R ...)" />
+            <marker date="1501758018242" expanded="true" signature="569:752" ph="(defn commpute-still-infected ...)" />
+            <marker date="1501758018242" expanded="true" signature="755:1122" ph="(defn start-cohort ...)" />
+            <marker date="1501758018242" expanded="true" signature="1125:1852" ph="(defn progress ...)" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/sir_model/core.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+        <state relative-caret-position="360">
+          <caret line="24" column="74" lean-forward="false" selection-start-line="24" selection-start-column="74" selection-end-line="24" selection-end-column="74" />
+          <folding>
+            <marker date="1501791861409" expanded="true" signature="0:442" ph="(ns sir-model.core ...)" />
+            <marker date="1501791861409" expanded="true" signature="445:899" ph="(defn -main ...)" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/sir_model/cohort_test.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="44" lean-forward="false" selection-start-line="1" selection-start-column="44" selection-end-line="1" selection-end-column="44" />
+          <folding>
+            <marker date="1501791914995" expanded="true" signature="0:70" ph="(ns sir-model.cohort-test ...)" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/sir_model/compartments.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="41" lean-forward="false" selection-start-line="24" selection-start-column="41" selection-end-line="24" selection-end-column="41" />
           <folding />
         </state>
       </provider>

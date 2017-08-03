@@ -15,7 +15,15 @@
            sir-comp (SIR-Compartments. 0 0 0)
            ]
        (create-compartments-map (dec timesteps) (assoc channel-map ts-key sir-comp)))
-     channel-map)))
+     channel-map)) )
+
+
+(defn initialize-compartments-map
+  [compartments-map n-susceptible initally-infected]
+  (-> compartments-map
+      (assoc-in [:1 :S] n-susceptible)
+      (assoc-in [:1 :I] initally-infected))
+  )
 
 
 (defn update-S [new-inf sir-record ]
