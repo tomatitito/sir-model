@@ -22,8 +22,8 @@
   (def s (->SIR-Compartments 100 21 42))
 
   ;create a compartments-map
-  (def sc (initialize-compartments-map (create-compartments-map 4) 1000 100))
-
+  ;(def sc (initialize-compartments-map (create-compartments-map 4) 1000 100))
+  (def sc (create-and-init-compartments-map 4 90 20))
   ;initially infected and susceptible
   ;(def sc (assoc-in sc [:1 :I] 100))
   ;(def sc (assoc-in sc [:1 :S] 1000))
