@@ -30,6 +30,7 @@
     (update-in compartments-map [(keyword (str t-cur))] #(compartments/update-SI new-inf %))
     ))
 
+
 (defn progress
   "Progression of a cohort. Returns the compartments-map when progression finishes."
   [t-cur t-max n-inf compartments-map recovery-param]
@@ -41,9 +42,10 @@
       compartments
 
       (let
-        [removed (I2R n-inf recovery-param)
+        [susceptible (get-in compartments-map [(keyword (str t-cur)) :S])
+         removed (I2R n-inf recovery-param)
          still-inf (commpute-still-infected cases removed)
-         updated-compartments (update-in compartments [(keyword (str t))] #(compartments/update-IR still-inf removed %)) ]
+         updated-compartments (update-in compartments [(keyword (str t))] #(compartments/update-IR susceptible still-inf removed %)) ]
 
         (recur
           (inc t)

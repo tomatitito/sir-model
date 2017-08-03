@@ -30,6 +30,12 @@
   (assoc-in sir-record [:I ] (+ (:I sir-record) still-infected)))
 
 
+(defn carry-over-S
+  "Number of susceptibles needs to be retained in progression of cohort."
+  [n-susceptible sir-record]
+  (assoc sir-record :S n-susceptible))
+
+
 (defn update-SI
   "Wraps update-S and update-I, because those functions are called at the start of a cohort."
   [new-inf sir-record]
@@ -39,8 +45,9 @@
 
 
 (defn update-IR
-  "Wrapps update-I and update-R, because those functions are called together during progression of a cohort."
-  [still-infected removed sir-record]
+  "During progression, this updates the I and R compartments and keeps track of number in S."
+  [susceptible still-infected removed sir-record]
   (->> sir-record
+       (carry-over-S susceptible)
        (update-R removed)
        (update-I still-infected) ))
