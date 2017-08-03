@@ -18,12 +18,11 @@
      channel-map)) )
 
 
-(defn initialize-compartments-map
-  [compartments-map n-susceptible initally-infected]
-  (-> compartments-map
+(defn create-and-init-compartments-map
+  [timesteps n-susceptible initally-infected]
+  (-> (create-compartments-map timesteps)
       (assoc-in [:1 :S] n-susceptible)
-      (assoc-in [:1 :I] initally-infected))
-  )
+      (assoc-in [:1 :I] initally-infected)))
 
 
 (defn update-S [new-inf sir-record ]
