@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f3caad09-b4ea-4c12-ad17-8fe60ccbce5d" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/sir_model/compartments.clj" afterPath="$PROJECT_DIR$/src/sir_model/compartments.clj" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/sir_model/core.clj" afterPath="$PROJECT_DIR$/src/sir_model/core.clj" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/sir_model/cohort_test.clj" afterPath="$PROJECT_DIR$/test/sir_model/cohort_test.clj" />
     </list>
@@ -150,7 +151,11 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="cursive.last.file.extension./home/dusty/sir-model/test" value="clj" />
   </component>
+<<<<<<< HEAD
   <component name="ReplState" timestamp="1501792932155">{:repl-history {:ide [], :local [{:command &quot;(ns sir-model.core)&quot;, :offset 19, :ns &quot;sir-modell.core&quot;} {:command &quot;(ns-interns sir-model.core)&quot;, :offset 27, :ns &quot;sir-model.core&quot;} {:command &quot;(ns-interns *ns*)&quot;, :offset 17, :ns &quot;sir-model.core&quot;} {:command &quot;(-main)&quot;, :offset 7, :ns &quot;sir-model.core&quot;}], :remote []}}</component>
+=======
+  <component name="ReplState" timestamp="1501792777996">{:repl-history {:ide [], :local [{:command &quot;(ns sir-model.core)&quot;, :offset 19, :ns &quot;sir-modell.core&quot;} {:command &quot;(ns-interns sir-model.core)&quot;, :offset 27, :ns &quot;sir-model.core&quot;} {:command &quot;(ns-interns *ns*)&quot;, :offset 17, :ns &quot;sir-model.core&quot;} {:command &quot;(-main)&quot;, :offset 7, :ns &quot;sir-model.core&quot;}], :remote []}}</component>
+>>>>>>> b65e1fe70c72d9dc4a2c34604e42d199cd4602f7
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -610,12 +615,20 @@
       <workItem from="1501083409515" duration="221000" />
       <workItem from="1501083663828" duration="1434000" />
       <workItem from="1501756171257" duration="2640000" />
+<<<<<<< HEAD
       <workItem from="1501788716506" duration="4212000" />
+=======
+      <workItem from="1501788716506" duration="4058000" />
+>>>>>>> b65e1fe70c72d9dc4a2c34604e42d199cd4602f7
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="9979000" />
+=======
+    <option name="totallyTimeSpent" value="9825000" />
+>>>>>>> b65e1fe70c72d9dc4a2c34604e42d199cd4602f7
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1920" height="1053" extended-state="6" />
@@ -786,8 +799,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/sir_model/core.clj">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="360">
           <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+=======
+        <state relative-caret-position="510">
+          <caret line="34" column="3" lean-forward="true" selection-start-line="34" selection-start-column="3" selection-end-line="34" selection-end-column="3" />
+>>>>>>> b65e1fe70c72d9dc4a2c34604e42d199cd4602f7
           <folding />
         </state>
       </provider>
