@@ -22,5 +22,4 @@
 
 (with-test
   (def test-record (->SIR-Compartments 0 0 0))
-  (is (= (->SIR-Compartments 0 42 43) (update-IR 42 43 test-record)))
-  )
+  (is (= (->SIR-Compartments 0 42 43) (update-IR 42 43 test-record))) )
