@@ -33,7 +33,7 @@
 (defn progress
   "Progression of a cohort. Returns the compartments-map when progression finishes."
   [t-cur t-max n-inf recovery-param compartments-map]
-  (loop [t (inc t-cur)
+  (loop [t t-cur
          cases n-inf
          compartments compartments-map]
 
