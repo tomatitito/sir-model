@@ -24,11 +24,13 @@
   (def s (->SIR-Compartments 100 21 42))
 
   ;create and initialize compartments-map
-  (def sc (create-and-init-compartments-map 4 90 20))
+  (def cm (create-and-init-compartments-map 4 100 4))
 
-  (println sc)
+  (println cm)
 
-  ;progression of a cohort
-  (progress 1 5 100  (start-cohort 1 sc 3) 0.4)
+  ;start and progression of a cohort
+  (->> cm
+       (start-cohort 1 3)
+       (progress 1 4 0 0.4))
   )
 

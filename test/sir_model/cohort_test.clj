@@ -33,7 +33,7 @@
   (let
 
     [init (create-and-init-compartments-map 7 1000 76)
-     compartments (progress 1 4 50 (start-cohort 1 init 2) 0.4)]
+     compartments (progress 1 4 50 0.4 (start-cohort 1 2 init ))]
 
     (testing "check for equalitiy of compartment-sums over timesteps"
       (is (test-sums compartments 1)))))

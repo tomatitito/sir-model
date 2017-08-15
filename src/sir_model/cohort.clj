@@ -23,17 +23,16 @@
 
 
 (defn start-cohort
-  [t-cur compartments-map R-0]
+  [t-cur R-0 compartments-map]
   (let [already-inf (get-in compartments-map [(keyword (str t-cur)) :I])
         new-inf (get-in (first (take 1 (doquery :smc new-infections-model [R-0 already-inf]))) [:result :new-infections])]
-    (println new-inf)
     (update-in compartments-map [(keyword (str t-cur))] #(compartments/update-SI new-inf %))
     ))
 
 
 (defn progress
   "Progression of a cohort. Returns the compartments-map when progression finishes."
-  [t-cur t-max n-inf compartments-map recovery-param]
+  [t-cur t-max n-inf recovery-param compartments-map]
   (loop [t (inc t-cur)
          cases n-inf
          compartments compartments-map]
