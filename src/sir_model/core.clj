@@ -9,11 +9,10 @@
         [anglican-code prob_functions distributions queries]
         util.functions
         sir-model.cohort
+        sir-model.cohort-test
         sir-model.compartments
     ;proto-repl-charts.charts
         ))
-
-
 
 
 (defn -main
@@ -29,8 +28,10 @@
   (println cm)
 
   ;start and progression of a cohort
-  (->> cm
-       (start-cohort 1 3)
-       (progress 1 4 0 0.4))
+  (def testrun (->> cm
+                 (start-cohort 1 3)
+                 (progress 1 4 0.4)))
+
   )
+
 
