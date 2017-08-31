@@ -46,7 +46,7 @@
 
     (testing "check for equalitiy of compartment-sums over timesteps"
       ;(is (test-sums compartments ))
-      (is (compare-sums-over-time compartments [:S :I :R]))
       (is (compare-sums-over-time compartments [:S]))
       (is (compare-sums-over-time compartments [:I :R]))
+      (is (compare-sums-over-time compartments [:S :I :R]))
       )))

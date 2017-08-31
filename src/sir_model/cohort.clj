@@ -13,17 +13,11 @@
   (let [already-inf (get-in compartments-map [(keyword (str t-cur)) :I])
         new-inf (get-in (first (take 1 (doquery :smc new-infections-model [R-0 already-inf]))) [:result :new-infections])]
 
-    ;(println "initial compartments-map:" compartments-map)
-    (println "Already infected at beginning of process" already-inf ", new infections in cohort:" new-inf)
+    (-> compartments-map
+        (assoc-in [(keyword (str t-cur)) :S] (- (get-in compartments-map [(keyword (str t-cur)) :S]) new-inf))
+        (assoc-in [(keyword (str t-cur)) :I] (+ (get-in compartments-map [(keyword (str t-cur)) :I]) new-inf)))
 
-    ;flow of people from S to I
-    ;(update-in compartments-map [(keyword (str t-cur))] #(compartments/update-SI new-inf %))
-    (assoc-in compartments-map [(keyword (str t-cur)) :S] (- (get-in compartments-map [(keyword (str t-cur)) :S]) new-inf))
-    (assoc-in compartments-map [(keyword (str t-cur)) :I] (+ (get-in compartments-map [(keyword (str t-cur)) :I]) new-inf))
-
-    ;(println "updated compartments-map:" compartments-map)
-
-    compartments-map
+    ;compartments-map
     ))
 
 
