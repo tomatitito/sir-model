@@ -1,7 +1,9 @@
 (ns anglican-code.queries
   (:use [anglican core emit runtime]
         anglican-code.distributions
-        anglican-code.prob_functions))
+        anglican-code.prob_functions)
+  (:require [sir-model.cohort :as cohort]
+            [sir-model.compartments :as compartments]))
 
 
 (with-primitive-procedures
@@ -14,3 +16,11 @@
               ;(if data
               ;  (observe (binomial current-infectio<ns transmission-rv) data))
               {:new-infections new :R0 R-0-est})))
+
+(with-primitive-procedures
+  [cohort/start-cohort]
+  (defquery
+    simple-poisson-process-model
+    [compartments-map]
+    (let
+      [x (cohort/start-cohort 1 100 10)])))
