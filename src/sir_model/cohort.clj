@@ -8,20 +8,25 @@
         [anglican-code distributions prob_functions queries] ))
 
 
-(defn start-cohort
-  [t-cur R-0 compartments-map]
-  (let [already-inf (get-in compartments-map [(keyword (str t-cur)) :I])
-        new-inf (get-in (first (take 1 (doquery :smc new-infections-model [R-0 already-inf]))) [:result :new-infections])]
+(defm start-cohort
+      [t-cur compartments-map  lambda-old lambda-new]
+      (let [
+            old-n (get-in compartments-map [(keyword (str t-cur)) :I])
+            new-n (sample (poisson (* old-n lambda-old)))
+            secondary (sample (poisson (* new-n lambda-new)))
+            weekly-cases (+ new-n secondary)]
 
-    (-> compartments-map
-        (assoc-in [(keyword (str t-cur)) :S] (- (get-in compartments-map [(keyword (str t-cur)) :S]) new-inf))
-        (assoc-in [(keyword (str t-cur)) :I] (+ (get-in compartments-map [(keyword (str t-cur)) :I]) new-inf)))
+        ;; if data available
+        ;(observe (poisson (+ (* old-n lambda-old) (* new-n lambda-new))) datapoint)
 
-    ;compartments-map
-    ))
+        ;; update compartments-map based on computations
+        (-> compartments-map
+            (assoc-in ,,, [(keyword (str t-cur)) :I] (+ (get-in compartments-map [(keyword (str t-cur)) :I]) weekly-cases))
+            (assoc-in ,,, [(keyword (str t-cur)) :S] (- (get-in compartments-map [(keyword (str t-cur)) :S]) weekly-cases)) )
+        ))
 
 
-(defn progress
+(defm progress
   "Progression of a cohort. After new individuals have been infected (which happened in the function start-cohort), at
    each timestep (starting one timestep after the start of the cohort) some people from the cohort recover. Progression
    continues until time is up. Returns the compartments-map."
