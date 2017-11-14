@@ -31,7 +31,7 @@
 
 
 (defquery sums-at-start [before-start]
-          (let [compartments (start-cohort 0 before-start 0.2 0.5)]
+          (let [compartments (start-cohort 0 0.2 0.5 before-start)]
             {:after-start compartments}))
 
 
@@ -42,13 +42,12 @@
         ]
     (testing
       (is (= (sum-compartments (before-start 0) [:S :I :R]) (sum-compartments (after-start 0) [:S :I :R])))
-      ))
-  )
+      )))
 
 
 (defquery sums-over-time [initial-comps ]
           (let [
-                before (start-cohort 0 initial-comps 0.2 0.5)
+                before (start-cohort 0 0.2 0.5 initial-comps)
                 after (progress 0 (dec (count before)) 0.5 before)
                 ]
             {:compartments after}))

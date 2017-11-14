@@ -1,13 +1,12 @@
 (ns sir-model.cohort
-  (:require [sir-model.compartments :as compartments] )
+  (:require [sir-model.compartments :refer :all] )
   (:use [anglican [core :exclude [-main]] runtime emit]
         [anglican-code distributions prob_functions queries] ))
 
 
 (defm start-cohort
-      [t-cur compartments-coll lambda-old lambda-new]
-      (let [
-            old-n (get-in compartments-coll [t-cur :I])
+      [t-cur lambda-old lambda-new compartments-coll]
+      (let [old-n (get-in compartments-coll [t-cur :I])
             new-n (sample (poisson (* old-n lambda-old)))
             secondary (sample (poisson (* new-n lambda-new)))
             weekly-cases (+ new-n secondary)
@@ -19,8 +18,7 @@
         ;; update compartments-map based on computations
         (-> compartments-coll
             (assoc-in ,,, [t-cur :I] (+ (get-in compartments-coll [t-cur :I]) weekly-cases))
-            (assoc-in ,,, [t-cur :S] (- (get-in compartments-coll [t-cur :S]) weekly-cases))
-            )))
+            (assoc-in ,,, [t-cur :S] (- (get-in compartments-coll [t-cur :S]) weekly-cases)))))
 
 
 (defm progress
@@ -55,5 +53,12 @@
         (recur
           (inc t)
           still-inf
-          updated-compartments
-          )))))
+          updated-compartments)))))
+
+
+(defm cohort-progression
+      [t-cur lambda-old lambda-new recovery-param compartments-coll]
+      (progress t-cur :unused recovery-param
+                (start-cohort t-cur lambda-old lambda-new compartments-coll)))
+
+

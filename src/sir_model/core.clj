@@ -13,25 +13,31 @@
         ))
 
 
+(def initial-coll
+  (create-and-init-compartments-map 10 100000 500))
 
-(defquery
-  simple-poisson-process-model
-  [compartments-coll]
-  (let
-    [
-     shape (sample (gamma 20 5))
-     R-0-dist (gamma shape 5)
-     R-0 (sample R-0-dist)
-     ;comp-map (progress 1 4 0.4
-     ;                   (start-cohort 1 R-0 compartments-map))
-     lambda-old (sample (uniform-continuous 0.5 1.5))
-     lambda-new (sample (uniform-continuous 1.5 2.5))
+(with-primitive-procedures
+  [create-and-init-compartments-map]
+  (defquery
+    simple-poisson-process-model
+    [compartments-coll]
+    (let
+      [
+       shape (sample (gamma 20 5))
+       R-0-dist (gamma shape 5)
+       R-0 (sample R-0-dist)
+       ;comp-map (progress 1 4 0.4
+       ;                   (start-cohort 1 R-0 compartments-map))
+       lambda-old (sample (uniform-continuous 0.5 1.5))
+       lambda-new (sample (uniform-continuous 1.5 2.5))
 
-     comp-map (progress 1 10 0.5 (start-cohort 1 compartments-coll lambda-old lambda-new))]
+       comp-map (cohort-progression 0 0.2 0.5 0.5 compartments-coll)
+       ;comp-map (progress 0 10 0.5 (start-cohort 0 lambda-old lambda-new compartments-coll))
+       ]
 
-    ;(observe (poisson (* 13 R-0)) 14)
+      ;(observe (poisson (* 13 R-0)) 14)
 
-    {:comp-map comp-map :l-old lambda-old :l-new lambda-new}))
+      {:comp-map comp-map :l-old lambda-old :l-new lambda-new})))
 
 
 
@@ -47,7 +53,7 @@
 
   (println cm)
 
-  (def samples (doquery :lmh test-1 [ cm]))
+  (def samples (doquery :lmh simple-poisson-process-model [initial-coll]))
 
   ;;start and progression of a cohort
   ;(def testrun (->> cm
