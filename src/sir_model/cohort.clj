@@ -5,21 +5,22 @@
 
 
 (defm start-cohort
-      [t-cur compartments-map  lambda-old lambda-new]
+      [t-cur compartments-coll lambda-old lambda-new]
       (let [
-            old-n (get-in compartments-map [(keyword (str t-cur)) :I])
+            old-n (get-in compartments-coll [t-cur :I])
             new-n (sample (poisson (* old-n lambda-old)))
             secondary (sample (poisson (* new-n lambda-new)))
-            weekly-cases (+ new-n secondary)]
+            weekly-cases (+ new-n secondary)
+            still-susceptible (- (get-in (first compartments-coll) [:S]) weekly-cases)]
 
         ;; if data available
         ;(observe (poisson (+ (* old-n lambda-old) (* new-n lambda-new))) datapoint)
 
         ;; update compartments-map based on computations
-        (-> compartments-map
-            (assoc-in ,,, [(keyword (str t-cur)) :I] (+ (get-in compartments-map [(keyword (str t-cur)) :I]) weekly-cases))
-            (assoc-in ,,, [(keyword (str t-cur)) :S] (- (get-in compartments-map [(keyword (str t-cur)) :S]) weekly-cases)) )
-        ))
+        (-> compartments-coll
+            (assoc-in ,,, [t-cur :I] (+ (get-in compartments-coll [t-cur :I]) weekly-cases))
+            (assoc-in ,,, [t-cur :S] (- (get-in compartments-coll [t-cur :S]) weekly-cases))
+            )))
 
 
 (defm progress
@@ -27,27 +28,29 @@
    each timestep (starting one timestep after the start of the cohort) some people from the cohort recover. Progression
    continues until time is up. Returns the compartments-map."
   [t-cur t-max recovery-param compartments-map]
-  (loop [t (inc t-cur)                                      ;recovery starts at the timestep after infection
-         cases (get-in compartments-map [(keyword (str t-cur)) :I])
+  (loop [;; recovery starts at the timestep after infection
+         ;; this makes sure that all newly infected can generate
+         ;; new cases at their time of infection
+         t (inc t-cur)
+         cases (get-in compartments-map [t-cur :I])
          compartments compartments-map]
 
-    (if (> t (count compartments-map))
+    (if (= t (count compartments-map))
       compartments
 
       (let
-        [current-t-key (keyword (str t))
-         last-t-key (keyword (str (dec t)))
+        [;; IMPORTANT: number of susceptibles has to remain
+         ;; constant during progression
+         susceptible (get-in compartments-map [t-cur :S])
 
-         susceptible (get-in compartments-map [(keyword (str t-cur)) :S]) ;for bookkeeping, number of susceptibles has to be constant during progression
          removed (sample* (binomial cases recovery-param))
          still-inf (max 0 (- cases removed))
 
          updated-compartments
          (-> compartments
-             (assoc-in ,,, [current-t-key :S] susceptible)
-             (assoc-in ,,, [current-t-key :I] (+ (get-in compartments [current-t-key :I]) still-inf))
-             (assoc-in ,,, [current-t-key :R] (+ (get-in compartments [current-t-key :R]) (get-in compartments [last-t-key :R]) removed)))
-         ]
+             (assoc-in ,,, [t :S] susceptible)
+             (assoc-in ,,, [t :I] (+ (get-in compartments [t :I]) still-inf))
+             (assoc-in ,,, [t :R] (+ (get-in compartments [t :R]) (get-in compartments [(dec t) :R]) removed)))]
 
         (recur
           (inc t)

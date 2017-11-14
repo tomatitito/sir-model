@@ -10,6 +10,6 @@
 
 
 (with-test
-  (def compartment-map (create-compartments-map 3))
+  (def compartment-map (create-compartments-coll 3))
   (is (= (count compartment-map) 3)))
 

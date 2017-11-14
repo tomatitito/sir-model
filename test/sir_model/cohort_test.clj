@@ -2,11 +2,15 @@
   (:require
     [clojure.test :refer :all]
     [sir-model.cohort :refer :all]
-    [sir-model.compartments :refer :all]))
+    [sir-model.compartments :refer :all])
+  (:use
+    [anglican [core :exclude [-main]] runtime emit]))
 
 
 (defn sum-compartments
-  "Sum specified compartments of an sir-record. Compartments have to be given as coll."
+  "Sum specified compartments of an sir-record. Compartments have to be given as coll.
+  Used to check, if e.g. the [:I :R] compartments sum to the same number over the course
+  of a progression, as they should."
   ([sir-record comps]
    (sum-compartments sir-record 0 comps))
   ([sir-record acc comps]
@@ -18,35 +22,46 @@
 
 
 (defn compare-sums-over-time
-  "Compares the sums of specified compartments pairwise for adjacent timesteps. Returns true, if all sums are equal."
+  "Calls sum-compartments for every timestep of a progression and compares
+  the results for equality."
   ([compartments-map comps]
-   (compare-sums-over-time compartments-map 1 comps))
-  ([compartments-map t comps]
-   (if (= t (count compartments-map))
-     true
-     (and (= (sum-compartments (get compartments-map (keyword (str t))) comps)
-             (sum-compartments (get compartments-map (keyword (str (inc t)))) comps))
-          (compare-sums-over-time compartments-map (inc t) comps)))) )
+    (let [match-val (get-in (first compartments-map) comps)
+          bool-vec (map #(= (get-in % comps) match-val) compartments-map)]
+      (reduce #(and %1 %2) bool-vec))))
+
+
+(defquery sums-at-start [before-start]
+          (let [compartments (start-cohort 0 before-start 0.2 0.5)]
+            {:after-start compartments}))
 
 
 (deftest sums-at-start-of-cohort
   (let [before-start (create-and-init-compartments-map 6 1000 100)
-        after-start (start-cohort 1 3 before-start)]
+        samples (doquery :lmh sums-at-start [before-start])
+        after-start (get-in (first samples) [:result :after-start])
+        ]
     (testing
-      (is (= (sum-compartments (:1 before-start) [:S :I :R]) (sum-compartments (:1 after-start) [:S :I :R])))
+      (is (= (sum-compartments (before-start 0) [:S :I :R]) (sum-compartments (after-start 0) [:S :I :R])))
       ))
   )
+
+
+(defquery sums-over-time [initial-comps ]
+          (let [
+                before (start-cohort 0 initial-comps 0.2 0.5)
+                after (progress 0 (dec (count before)) 0.5 before)
+                ]
+            {:compartments after}))
 
 
 (deftest sums-in-progression
   (let
 
     [init (create-and-init-compartments-map 30 10000 600)
-     compartments (progress 1 (count init) 0.4 (start-cohort 1 2 init ))]
+     samples (doquery :lmh sums-over-time [init 10])
+     compartments (get-in (first samples) [:result :compartments]) ]
 
     (testing "check for equalitiy of compartment-sums over timesteps"
-      ;(is (test-sums compartments ))
       (is (compare-sums-over-time compartments [:S]))
       (is (compare-sums-over-time compartments [:I :R]))
-      (is (compare-sums-over-time compartments [:S :I :R]))
-      )))
+      (is (compare-sums-over-time compartments [:S :I :R])))))
