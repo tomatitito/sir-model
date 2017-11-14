@@ -1,5 +1,4 @@
-(ns sir-model.compartments
-  (:require [clojure.core.async :as as]))
+(ns sir-model.compartments)
 
 
 (defrecord SIR-Compartments

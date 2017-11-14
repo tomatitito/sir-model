@@ -2,9 +2,7 @@
   (:gen-class)
   (:require [clojure.java.io :as io]
             [clojure.data.csv :as csv]
-            [util.functions :as util]
-            [clojure.core.async :as a]
-            )
+            [util.functions :as util] )
   (:use [anglican [core :exclude [-main]] runtime emit stat]
         [anglican-code prob_functions distributions queries]
         util.functions

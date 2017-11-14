@@ -1,9 +1,5 @@
 (ns sir-model.cohort
-  (:require [clojure.core.async
-             :as as
-             :refer [<! <!! >! >!! take! put! pipe go chan buffer close! thread alts! alts!! alt! timeout]]
-            [sir-model.compartments :as compartments]
-            )
+  (:require [sir-model.compartments :as compartments] )
   (:use [anglican [core :exclude [-main]] runtime emit]
         [anglican-code distributions prob_functions queries] ))
 
