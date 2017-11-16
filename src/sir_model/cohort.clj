@@ -5,7 +5,7 @@
 
 
 (defm start-cohort
-      [t-cur lambda-old lambda-new compartments-coll]
+      [t-cur lambda-old lambda-new compartments-coll & data]
       (let [old-n (get-in compartments-coll [t-cur :I])
             new-n (sample (poisson (* old-n lambda-old)))
             secondary (sample (poisson (* new-n lambda-new)))
@@ -13,7 +13,8 @@
             still-susceptible (- (get-in (first compartments-coll) [:S]) weekly-cases)]
 
         ;; if data available
-        ;(observe (poisson (+ (* old-n lambda-old) (* new-n lambda-new))) datapoint)
+        (when data
+          (observe (poisson (+ (* old-n lambda-old) (* new-n lambda-new))) (first data)))
 
         ;; update compartments-map based on computations
         (-> compartments-coll
@@ -50,15 +51,20 @@
              (assoc-in ,,, [t :I] (+ (get-in compartments [t :I]) still-inf))
              (assoc-in ,,, [t :R] (+ (get-in compartments [t :R]) (get-in compartments [(dec t) :R]) removed)))]
 
-        (recur
-          (inc t)
-          still-inf
-          updated-compartments)))))
+        (recur (inc t)
+               still-inf
+               updated-compartments)))))
 
 
 (defm cohort-progression
-      [t-cur lambda-old lambda-new recovery-param compartments-coll]
-      (progress t-cur :unused recovery-param
-                (start-cohort t-cur lambda-old lambda-new compartments-coll)))
+      [t-cur lambda-old lambda-new recovery-param compartments-coll & data]
+      (if data
+        (progress t-cur :unused recovery-param
+                  (start-cohort t-cur lambda-old lambda-new compartments-coll (first data)))
+        (progress t-cur :unused recovery-param
+                  (start-cohort t-cur lambda-old lambda-new compartments-coll))))
 
 
+;(defm season
+;      [progression-fun n-weeks configuration-data]
+;      (let [compartments-coll (create-and-init-compartments-map)]))
