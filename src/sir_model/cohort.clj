@@ -26,7 +26,7 @@
   "Progression of a cohort. After new individuals have been infected (which happened in the function start-cohort), at
    each timestep (starting one timestep after the start of the cohort) some people from the cohort recover. Progression
    continues until time is up. Returns the compartments-map."
-  [t-cur t-max recovery-param compartments-map]
+  [t-cur recovery-param compartments-map]
   (loop [;; recovery starts at the timestep after infection
          ;; this makes sure that all newly infected can generate
          ;; new cases at their time of infection
@@ -59,9 +59,9 @@
 (defm cohort-progression
       [t-cur lambda-old lambda-new recovery-param compartments-coll & data]
       (if data
-        (progress t-cur :unused recovery-param
+        (progress t-cur recovery-param
                   (start-cohort t-cur lambda-old lambda-new compartments-coll (first data)))
-        (progress t-cur :unused recovery-param
+        (progress t-cur recovery-param
                   (start-cohort t-cur lambda-old lambda-new compartments-coll))))
 
 

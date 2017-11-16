@@ -48,7 +48,7 @@
 (defquery sums-over-time [initial-comps ]
           (let [
                 before (start-cohort 0 0.2 0.5 initial-comps)
-                after (progress 0 (dec (count before)) 0.5 before)
+                after (progress 0 0.5 before)
                 ]
             {:compartments after}))
 
@@ -64,3 +64,23 @@
       (is (compare-sums-over-time compartments [:S]))
       (is (compare-sums-over-time compartments [:I :R]))
       (is (compare-sums-over-time compartments [:S :I :R])))))
+
+
+;(with-primitive-procedures
+;  [create-compartments-coll]
+;  (defquery multiple-cohorts
+;            [length-coll]
+;            (let [coll (create-compartments-coll length-coll)
+;                  ts (into [] (range length-coll))
+;                  mapped-coll (map #(mimic-start-cohort % coll) ts)]
+;              {:mapped-coll mapped-coll})))
+;
+;
+;(deftest multiple-cohorts-test
+;  (let [n-times (sample* (uniform-discrete 1 100))
+;        samples (doquery :lmh multiple-cohorts [n-times])]
+;    (testing
+;      (is
+;        (=
+;          (get-in (first samples) [:result :mapped-coll])
+;          (into [] (range n-times)))))))
