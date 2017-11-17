@@ -1,7 +1,31 @@
 (ns sir-model.cohort
-  (:require [sir-model.compartments :refer :all] )
+  ;(:require [sir-model.compartments :refer :all] )
   (:use [anglican [core :exclude [-main]] runtime emit]
         [anglican-code distributions prob_functions queries] ))
+
+
+(defrecord SIR-Compartments
+  [S I R] )
+
+
+(defn create-compartments-coll
+  "Creates a map of length timesteps with each entry being an SIR-Compartments record."
+  ([timesteps] (create-compartments-coll timesteps []))
+  ([timesteps coll] (into coll (repeatedly timesteps #(->SIR-Compartments 0 0 0)))))
+
+
+(defn initialize-compartments-coll
+  [coll n-susceptible initially-infected]
+  (-> coll
+      (assoc-in [0 :S] n-susceptible)
+      (assoc-in [0 :I] initially-infected)))
+
+
+(defn create-and-init-compartments-map
+  [timesteps n-susceptible initially-infected]
+  (-> timesteps
+      (create-compartments-coll)
+      (initialize-compartments-coll n-susceptible initially-infected)))
 
 
 (defm start-cohort
@@ -60,11 +84,47 @@
       [t-cur lambda-old lambda-new recovery-param compartments-coll & data]
       (if data
         (progress t-cur recovery-param
-                  (start-cohort t-cur lambda-old lambda-new compartments-coll (first data)))
+                  (start-cohort t-cur lambda-old lambda-new compartments-coll data))
         (progress t-cur recovery-param
                   (start-cohort t-cur lambda-old lambda-new compartments-coll))))
 
 
-;(defm season
-;      [progression-fun n-weeks configuration-data]
-;      (let [compartments-coll (create-and-init-compartments-map)]))
+(with-primitive-procedures
+  [create-and-init-compartments-map]
+  (defquery
+    simple-poisson-process-model
+    [n-weeks prog-fn n-susceptibles initially-infected & data]
+    (let
+      [
+       shape (sample (gamma 20 5))
+       R-0-dist (gamma shape 5)
+       R-0 (sample R-0-dist)
+       ;comp-map (progress 1 4 0.4
+       ;                   (start-cohort 1 R-0 compartments-map))
+       lambda-old (sample (uniform-continuous 0.5 1.5))
+       lambda-new (sample (uniform-continuous 1.5 2.5))
+       recovery-par 0.5
+       ;n-weeks 10
+       initial-coll (create-and-init-compartments-map n-weeks n-susceptibles initially-infected)
+
+       ;comp-map (cohort-progression 0 0.2 0.5 0.5 compartments-coll 32)
+
+       season-fn (fn season-fn [week n-weeks par-1 par-2 recov coll & data]
+                   (if (= week n-weeks)
+                     coll
+
+                     (if data
+                       (let [[head & tail] data
+                             updated-coll (prog-fn week par-1 par-2 recov coll head)]
+                         (season-fn (inc week) n-weeks par-1 par-2 recov updated-coll tail))
+
+                       (let [updated-coll (prog-fn week par-1 par-2 recov coll)]
+                         (season-fn (inc week) n-weeks par-1 par-2 recov updated-coll)))
+                     )
+                   )
+
+       season-data (season-fn 0 n-weeks lambda-old lambda-new recovery-par initial-coll)
+       ]
+
+
+      {:season season-data :lambda-old lambda-old :l-new lambda-new})))

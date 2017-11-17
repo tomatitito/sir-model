@@ -2,9 +2,23 @@
   (:require
     [clojure.test :refer :all]
     [sir-model.cohort :refer :all]
-    [sir-model.compartments :refer :all])
+    ;[sir-model.compartments :refer :all]
+    )
   (:use
     [anglican [core :exclude [-main]] runtime emit]))
+
+
+;; first two tests moved from compartments_test
+(with-test
+  (def test-record (->SIR-Compartments 4 4 4))
+  (is (= (:S test-record) 4))
+  (is (= (:I test-record) 4))
+  (is (= (:R test-record) 4)))
+
+
+(with-test
+  (def compartment-map (create-compartments-coll 3))
+  (is (= (count compartment-map) 3)))
 
 
 (defn sum-compartments
@@ -58,12 +72,15 @@
 
     [init (create-and-init-compartments-map 30 10000 600)
      samples (doquery :lmh sums-over-time [init 10])
-     compartments (get-in (first samples) [:result :compartments]) ]
+     compartments (get-in (first samples) [:result :compartments])
+     samples2 (doquery :lmh simple-poisson-process-model [10 cohort-progression 70000000 30])
+     season (get-in samples2 [:result :season])]
 
     (testing "check for equalitiy of compartment-sums over timesteps"
       (is (compare-sums-over-time compartments [:S]))
       (is (compare-sums-over-time compartments [:I :R]))
-      (is (compare-sums-over-time compartments [:S :I :R])))))
+      (is (compare-sums-over-time compartments [:S :I :R]))
+      (is (compare-sums-over-time season [:S :I :R])))))
 
 
 ;(with-primitive-procedures
