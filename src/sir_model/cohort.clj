@@ -1,7 +1,5 @@
 (ns sir-model.cohort
-  ;(:require [sir-model.compartments :refer :all] )
-  (:use [anglican [core :exclude [-main]] runtime emit]
-        [anglican-code distributions prob_functions queries] ))
+  (:use [anglican [core :exclude [-main]] runtime emit]))
 
 
 (defrecord SIR-Compartments

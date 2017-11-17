@@ -1,9 +1,7 @@
 (ns sir-model.cohort-test
   (:require
     [clojure.test :refer :all]
-    [sir-model.cohort :refer :all]
-    ;[sir-model.compartments :refer :all]
-    )
+    [sir-model.cohort :refer :all] )
   (:use
     [anglican [core :exclude [-main]] runtime emit]))
 
@@ -72,32 +70,18 @@
 
     [init (create-and-init-compartments-map 30 10000 600)
      samples (doquery :lmh sums-over-time [init 10])
-     compartments (get-in (first samples) [:result :compartments])
-     samples2 (doquery :lmh simple-poisson-process-model [10 cohort-progression 70000000 30])
-     season (get-in samples2 [:result :season])]
+     compartments (get-in (first samples) [:result :compartments])]
 
-    (testing "check for equalitiy of compartment-sums over timesteps"
+    (testing "Check for equalitiy of compartment-sums over timesteps in a single cohort."
       (is (compare-sums-over-time compartments [:S]))
       (is (compare-sums-over-time compartments [:I :R]))
-      (is (compare-sums-over-time compartments [:S :I :R]))
+      (is (compare-sums-over-time compartments [:S :I :R])))))
+
+
+(deftest sums-in-season
+  (let
+    [samples (doquery :lmh simple-poisson-process-model [10 cohort-progression 70000000 30])
+     season (get-in (first samples) [:result :season])]
+    (testing "Check if total number of individuals remains constant in a season."
       (is (compare-sums-over-time season [:S :I :R])))))
 
-
-;(with-primitive-procedures
-;  [create-compartments-coll]
-;  (defquery multiple-cohorts
-;            [length-coll]
-;            (let [coll (create-compartments-coll length-coll)
-;                  ts (into [] (range length-coll))
-;                  mapped-coll (map #(mimic-start-cohort % coll) ts)]
-;              {:mapped-coll mapped-coll})))
-;
-;
-;(deftest multiple-cohorts-test
-;  (let [n-times (sample* (uniform-discrete 1 100))
-;        samples (doquery :lmh multiple-cohorts [n-times])]
-;    (testing
-;      (is
-;        (=
-;          (get-in (first samples) [:result :mapped-coll])
-;          (into [] (range n-times)))))))

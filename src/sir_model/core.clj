@@ -2,15 +2,10 @@
   (:gen-class)
   (:require [clojure.java.io :as io]
             [clojure.data.csv :as csv]
-            [util.functions :as util])
+            [util.functions :as util]
+            )
   (:use [anglican [core :exclude [-main]] runtime emit stat]
-        [anglican-code prob_functions distributions queries]
-        util.functions
-        sir-model.cohort
-        sir-model.cohort-test
-        ;sir-model.compartments
-    ;proto-repl-charts.charts
-        ))
+        sir-model.cohort))
 
 
 ;; create and initialize compartments-coll
