@@ -2,39 +2,45 @@
   (:require [clojure.java.io :as io]
             [clojure.data.csv :as csv]))
 
-
-(defn write-to-file [ results param path]
-  (with-open [writer (io/writer path)]
-    (doseq [line results]
-      (.write writer (str (param (first (:predicts line))) "\n")))))
-
-
-(defn extract-result
-  "Extracts data for given keyword from results and outputs a vector."
-   [query-output keyw]
-   (for [x query-output] (keyw (:result x))))
+(defn from-season
+  "Extracts value for key from a single sample. key must be in a result from
+  an anglican query."
+  [sample key]
+  (reduce
+    #(conj %1 (key %2))
+    []
+    (get-in sample [:result :season])))
 
 
-(defn format4barchart
-  "Takes data as produced by frequencies-function and brings them in
-   in the right format for proto-repl barchart."
-  [freqs]
-  (for [x freqs] (second x)))
+(defn total-infected
+  "Extracts number of infected individuals for a single sample from the Model."
+  [sample]
+  (from-season sample :I))
 
 
-(defn from-frequencies [freqs position]
-  (for [x freqs] (nth x position)))
+(defn write-seasons!
+  [samples n-runs outfile]
+  (letfn
+    [(csv-for-single-season [cases sim-id]
+       (let [weeks (range (count cases))
+             sim-ids (repeat (count cases) sim-id)]
+         (partition 3
+                    (interleave weeks cases sim-ids))))
 
+     (build-csvs [samples n-runs]
+       (loop [coll []
+              from-query samples
+              n 0]
+         (if (= n n-runs)
+           coll
 
-(defn print-infections-in-cohort [the-map]
-  "Prints only the values of cur-inf-map"
-  (dotimes [i (count the-map)]
-    (print (deref ((keyword (str i)) the-map)) " "))
-  (println))
+           (let [cases (total-infected (first from-query))
+                 csv-dat (csv-for-single-season cases n)]
+             (recur (apply conj coll csv-dat)
+                    (rest from-query)
+                    (inc n))))))
 
-
-(defn ref-type-map [ref-type size]
-  "Create map where each entry is of specified reference type."
-  (zipmap
-    (map #(keyword (str %)) (range size))
-    (repeatedly size #(ref-type 0))) )
+     ]
+    ;(build-csvs samples n-weeks)
+    (with-open [writer (io/writer outfile)]
+      (csv/write-csv writer (build-csvs samples n-runs)))))

@@ -1,9 +1,15 @@
+library(ggplot2)
+
+
 plot_results = function(path){
-  library(ggplot2)
-  dat = read.csv(path,header=FALSE)
-  names(dat) = "Param"
-  p = ggplot(dat, aes(Param)) + geom_histogram()
-  ggsave(file="results.pdf")
+  dat <- read.csv(path,colClasses=c("factor", "numeric", "factor"),header=FALSE)
+
+  ## dat needs three columns:
+  ## week, cases, simulation-index
+  names(dat) <- c("week", "cases", "sim_id")
+
+  p <- ggplot(dat, aes(week, cases, color=sim_id)) + geom_line() + geom_point()
+  ggsave(file="season.pdf")
 }
 
-plot_results("data/results.dat")
+plot_results("~/sir-model/data/seasons.csv")
