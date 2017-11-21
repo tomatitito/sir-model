@@ -21,26 +21,29 @@
 (defn write-seasons!
   [samples n-runs outfile]
   (letfn
-    [(csv-for-single-season [cases sim-id]
-       (let [weeks (range (count cases))
-             sim-ids (repeat (count cases) sim-id)]
+    [(data-for-single-season [cases sim-id]
+       (let
+         [weeks (range (count cases))
+          sim-ids (repeat (count cases) sim-id)]
+
          (partition 3
                     (interleave weeks cases sim-ids))))
 
-     (build-csvs [samples n-runs]
+     (csv-data [samples]
        (loop [coll []
               from-query samples
               n 0]
-         (if (= n n-runs)
+
+         (if (not (seq from-query))
            coll
 
-           (let [cases (total-infected (first from-query))
-                 csv-dat (csv-for-single-season cases n)]
+           (let
+             [cases (total-infected (first from-query))
+              csv-dat (data-for-single-season cases n)]
+
              (recur (apply conj coll csv-dat)
                     (rest from-query)
-                    (inc n))))))
+                    (inc n))))))]
 
-     ]
-    ;(build-csvs samples n-weeks)
     (with-open [writer (io/writer outfile)]
-      (csv/write-csv writer (build-csvs samples n-runs)))))
+      (csv/write-csv writer (csv-data samples)))))

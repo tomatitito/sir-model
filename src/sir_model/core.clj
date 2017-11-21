@@ -7,18 +7,15 @@
   (:use [anglican [core :exclude [-main]] runtime emit stat]
         sir-model.cohort))
 
-
-;; create and initialize compartments-coll
-;; TODO: rename function to create-and-init-compartments-coll
-(def initial-coll
-  (create-and-init-compartments-map 10 100000 500))
-
+;(take-nth 5 (drop 500 (take 1000 samples))
 
 (defn -main
   "Probabilistic SIR-Model"
   [& args]
 
-  (def samples (doquery :lmh simple-poisson-process-model [10 cohort-progression 70000000 30]))
+  (def samples (doquery :smc simple-poisson-process-model [10 cohort-progression 70000000 30] :particles 1000))
+  (def burned (take-nth 10 (drop 100 (take 500 samples))))
+  (util.functions/write-seasons! burned :unused "data/testdat.csv")
 
   )
 
