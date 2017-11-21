@@ -86,6 +86,10 @@
         (progress t-cur recovery-param
                   (start-cohort t-cur lambda-old lambda-new compartments-coll))))
 
+(defm test-cohort
+      [t-cur lambda-old lambda-new recovery-param coll]
+      (start-cohort t-cur lambda-old lambda-new coll))
+
 
 (with-primitive-procedures
   [create-and-init-compartments-map]
@@ -97,15 +101,12 @@
        shape (sample (gamma 20 5))
        R-0-dist (gamma shape 5)
        R-0 (sample R-0-dist)
-       ;comp-map (progress 1 4 0.4
-       ;                   (start-cohort 1 R-0 compartments-map))
+
        lambda-old (sample (uniform-continuous 0.5 1.5))
        lambda-new (sample (uniform-continuous 1.5 2.5))
        recovery-par 0.5
-       ;n-weeks 10
        initial-coll (create-and-init-compartments-map n-weeks n-susceptibles initially-infected)
 
-       ;comp-map (cohort-progression 0 0.2 0.5 0.5 compartments-coll 32)
 
        season-fn (fn season-fn [week n-weeks par-1 par-2 recov coll & data]
                    (if (= week n-weeks)
