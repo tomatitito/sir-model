@@ -8,7 +8,7 @@ plot_results = function(path){
   ## week, cases, simulation-index
   names(dat) <- c("week", "cases", "sim_id")
 
-  p <- ggplot(dat, aes(week, cases, color=sim_id)) + geom_line() + geom_point()
+  p <- ggplot(dat, aes(week, cases)) + geom_line(aes(group=sim_id),alpha=1/10) 
   ggsave(file="season.pdf")
 }
 
