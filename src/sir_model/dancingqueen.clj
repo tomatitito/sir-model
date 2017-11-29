@@ -41,6 +41,18 @@
   (a->b [t :S] [t :secondary] value coll))
 
 
+(with-primitive-procedures
+  [S->]
+  (defm infect
+        "Infections for time t. Infecting individuals from who infect new individuals as specified by how (must be a
+        function). Returns updated-coll."
+        [t who whom how coll]
+        (let
+          [old-cases (get-in coll [t who])
+           new-cases (how old-cases)]
+          (S-> t whom new-cases coll))))
+
+
 (defm generate-poisson
       [N lambda]
       "Draws a sample from the distribution of new infections given parameter lambda and number of already
@@ -71,7 +83,7 @@
        lambda-1 (sample (:prior-1 args))
 
        ;ans (primary-poisson 0 2 compartments)
-       ans (S-> 3 :R 42 compartments)
+       ans (infect 0 :S :I #(generate-poisson % lambda-1) compartments)
        ]
 
       {:ans ans})))
