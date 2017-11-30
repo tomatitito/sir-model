@@ -41,6 +41,20 @@
   (a->b [t :S] [t :secondary] value coll))
 
 
+(defn ->comp
+  "Adds value to possibly nested map. target ist a keyseq for determining where to add value."
+  [target value m]
+  (update-in m target + value))
+
+
+(defn ->I [t value coll]
+  (->comp [t :I] value coll))
+
+
+(defn ->R [t value coll]
+  (->comp [t :R] value coll))
+
+
 (with-primitive-procedures
   [S->]
   (defm infect
@@ -84,13 +98,45 @@
       [t l-1 l-2 coll]
       ((comp
          #(secondary-poisson t l-2 %)
-         #(primary-poisson t l-1 %)
-         )
+         #(primary-poisson t l-1 %))
         coll))
 
 
+(defn cohort-size
+  "Number of individuals for cohort starting from time t."
+  [t coll]
+  (+
+    (get-in coll [t :primary])
+    (get-in coll [t :secondary])))
+
 (with-primitive-procedures
-  [create-args-coll S->]
+  [cohort-size]
+  (defm progress
+        "Progression of a cohort through time after the cohort has been started."
+        [t recovery-par coll]
+
+        (let [cases (cohort-size t coll)]
+
+          (loop
+            [left cases
+             t-cur (inc t)
+             coll-with-new (assoc-in coll [(inc t) :I] (+ (get-in coll [t :I]) cases))
+             ]
+
+            (if (= t-cur (count coll))
+              coll-with-new
+
+              (let
+                [removed (sample (binomial cases recovery-par))
+                 left (- cases removed)]
+
+                (recur left
+                       (inc t-cur)
+                       (assoc-in coll-with-new [(inc t-cur) :I] (+ (get-in coll-with-new [t-cur :I]) left)))))))))
+
+
+(with-primitive-procedures
+  [create-args-coll S-> ->I ->R]
   (defquery
     dancing-query
     [args]
@@ -99,8 +145,8 @@
       [compartments (create-args-coll (:t-max args) (:compartments args) (:inits args))
        lambda-1 (sample (:prior-1 args))
 
-       ;ans (primary-poisson 0 lambda-1 compartments)
-       ans (start-poisson-poisson 0 0.2 0.4 compartments)
+       ans (->R 3 42 (start-poisson-poisson 0 0.2 0.4 compartments))
+       ;ans (progress 0 0.5 compartments)
        ]
 
       {:ans ans})))
@@ -109,7 +155,7 @@
 (def arg-map
   {:t-max        10
    :compartments [:S :I :R :primary :secondary]
-   :inits        {:S 1000 :I 10}
+   :inits        {:S 1000 :I 10 :primary 2 :secondary 3}
    :prior-1      (uniform-continuous 0.2 0.5)
    :params       [1 2]
    :data         [2 1 0 3]}
