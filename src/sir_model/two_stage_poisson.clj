@@ -54,7 +54,7 @@
         [t cases coll]
 
         (if (= t (count coll))
-          ;; if time's up, eventually remaining cases
+          ;; if time's up, remaining cases
           ;; are discarded
           coll
 
@@ -62,14 +62,15 @@
             [removed (sample (binomial cases 0.5))
              remaining (- cases removed)
 
+             ;; update-rules returns a vector that has all
+             ;; information about how coll is updated
              where-and-what (update-rules t cases removed)
 
              ;; in addition to removed and remaining cases,
              ;; the number of susceptibles must be retained
              ;; throughout the progression
              updated-1 (->compartments where-and-what coll)
-             updated-coll (assoc-in updated-1 [t :S] (get-in updated-1 [(dec t) :S]) )
-             ]
+             updated-coll (assoc-in updated-1 [t :S] (get-in updated-1 [(dec t) :S]))]
 
             (progress (inc t) remaining updated-coll)))))
 
@@ -84,6 +85,26 @@
           coll)))
 
 
+(defm season-fn
+      "Generic function for simulating an influenza season. Takes a starting-timestep,
+      a lifetime-fn and a collection of compartments. lifetime-fn has to be a function
+      that expects two arguments, the timestep and and collection."
+      [t coll lifetime-fn]
+      (let
+        ;; before the actual simulation, progression for already
+        ;; infected individuals at time 0 must be run once
+        [initially-infected (get-in coll [0 :I])
+            initial-coll (progress 1 initially-infected coll)]
+        (loop [t-cur t
+               coll initial-coll]
+
+          (if (= t-cur (count coll))
+            coll
+
+            (recur (inc t-cur)
+                   (lifetime-fn t-cur coll))))))
+
+
 (with-primitive-procedures
   [flow/create-args-coll]
   (defquery
@@ -95,16 +116,18 @@
        lambda-1 (sample (:prior-1 args))
        lambda-2 (sample (:prior-2 args))
 
-       season-fn (fn [t r-1 r-2 coll]
-                   (loop [t-cur t
-                          coll coll]
-                     (if (= t-cur (count coll))
-                       coll
-                       (recur (inc t-cur)
-                              (lifetime-fn t-cur r-1 r-2 coll))))
-                   )
+       ;season-fn (fn [t r-1 r-2 coll]
+       ;            (loop [t-cur t
+       ;                   coll coll]
+       ;              (if (= t-cur (count coll))
+       ;                coll
+       ;                (recur (inc t-cur)
+       ;                       (lifetime-fn t-cur r-1 r-2 coll))))
+       ;            )
 
-       ans (season-fn 0 lambda-1 lambda-2 compartments)
+       ;ans (season-fn 0 lambda-1 lambda-2 compartments)
+       f #(lifetime-fn %1 lambda-1 lambda-2 %2)
+       ans (season-fn 0 compartments f)
 
        ]
 
