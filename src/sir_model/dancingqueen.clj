@@ -41,18 +41,34 @@
   (a->b [t :S] [t :secondary] value coll))
 
 
-(defn ->comp
-  "Adds value to possibly nested map. target ist a keyseq for determining where to add value."
-  [target value m]
-  (update-in m target + value))
+(defn ->coll
+  "Adds value to compartments coll. target is a keyseq for determining where to add value."
+  [target value coll]
+    (update-in coll target + value))
+
+
+(defn ->compartments
+  "Adds multiple values to corresponding compartments. args needs to be a sequence of vector
+  nested keys and corresponding values. Returns updated coll with each value added to the
+  corresponding compartment."
+  [targets-and-vals coll]
+  (let [pairs (partition 2 targets-and-vals)]
+    (reduce #(->coll (first %2) (second %2) %1) coll pairs)))
 
 
 (defn ->I [t value coll]
-  (->comp [t :I] value coll))
+  (->coll [t :I] value coll))
 
 
 (defn ->R [t value coll]
-  (->comp [t :R] value coll))
+  (->coll [t :R] value coll))
+
+
+(defn update-rules
+  "Given the number of cases and the number of removed individuals, determines how the compartments need to be updated.
+  Returns a vector of (nested) keyseqs and corresponding values, which is fed into ->compartments."
+  [t cases removed]
+  [[t :R] removed [t :I] (- cases removed)])
 
 
 (with-primitive-procedures
@@ -109,54 +125,76 @@
     (get-in coll [t :primary])
     (get-in coll [t :secondary])))
 
+
 (with-primitive-procedures
-  [cohort-size]
+  [update-rules ->compartments]
   (defm progress
-        "Progression of a cohort through time after the cohort has been started."
-        [t recovery-par coll]
+        [t cases coll]
 
-        (let [cases (cohort-size t coll)]
+        (if (= t (count coll))
+          ;; if time's up, eventually remaining cases
+          ;; are discarded
+          coll
 
-          (loop
-            [left cases
-             t-cur (inc t)
-             coll-with-new (assoc-in coll [(inc t) :I] (+ (get-in coll [t :I]) cases))
+          (let
+            [removed (sample (binomial cases 0.5))
+             remaining (- cases removed)
+
+             where-and-what (update-rules t cases removed)
+
+             ;; in addition to removed and remaining cases,
+             ;; the number of susceptibles must be retained
+             ;; throughout the progression
+             updated-1 (->compartments where-and-what coll)
+             updated-coll (assoc-in updated-1 [t :S] (get-in updated-1 [(dec t) :S]) )
              ]
 
-            (if (= t-cur (count coll))
-              coll-with-new
-
-              (let
-                [removed (sample (binomial cases recovery-par))
-                 left (- cases removed)]
-
-                (recur left
-                       (inc t-cur)
-                       (assoc-in coll-with-new [(inc t-cur) :I] (+ (get-in coll-with-new [t-cur :I]) left)))))))))
+            (progress (inc t) remaining updated-coll)))))
 
 
 (with-primitive-procedures
-  [create-args-coll S-> ->I ->R]
+  [cohort-size]
+  (defm form-and-prog
+        [t l-1 l-2 coll]
+        ((comp
+           #(progress (inc t) (cohort-size t %) %)
+           #(start-poisson-poisson t l-1 l-2 %))
+          coll)))
+
+
+(with-primitive-procedures
+  [create-args-coll]
   (defquery
     dancing-query
-    [args]
+    [args lifetime-fn]
 
     (let
       [compartments (create-args-coll (:t-max args) (:compartments args) (:inits args))
        lambda-1 (sample (:prior-1 args))
+       lambda-2 (sample (:prior-2 args))
 
-       ans (->R 3 42 (start-poisson-poisson 0 0.2 0.4 compartments))
-       ;ans (progress 0 0.5 compartments)
+       season-fn (fn [t r-1 r-2 coll]
+                   (loop [t-cur t
+                          coll coll]
+                     (if (= t-cur (count coll))
+                       coll
+                       (recur (inc t-cur)
+                              (lifetime-fn t-cur r-1 r-2 coll))))
+                   )
+
+       ans (season-fn 0 lambda-1 lambda-2 compartments)
+
        ]
 
       {:ans ans})))
 
 
 (def arg-map
-  {:t-max        10
+  {:t-max        30
    :compartments [:S :I :R :primary :secondary]
-   :inits        {:S 1000 :I 10 :primary 2 :secondary 3}
-   :prior-1      (uniform-continuous 0.2 0.5)
+   :inits        {:S 10000 :I 1000}
+   :prior-1      (uniform-continuous 0.2 0.4)
+   :prior-2      (uniform-continuous 0.3 0.5)
    :params       [1 2]
    :data         [2 1 0 3]}
   )
@@ -165,7 +203,7 @@
 
 
 
-(def samples (doquery :lmh dancing-query [arg-map]))
+(def samples (doquery :lmh dancing-query [arg-map form-and-prog]))
 (first samples)
 (u/from-result (first samples) [:new 0 :S])
 
@@ -177,11 +215,3 @@
       (take-nth thin m)))
   ([args n]
     (posterior args n 1)))
-
-;(def comp-map (create-args-coll 10 [:S :I :R :primary :secondary] {:S 1000 :I 10}))
-;comp-map
-;
-;(def samples (posterior comp-map 5))
-;samples
-;(util.functions/from-results samples [:new])
-
