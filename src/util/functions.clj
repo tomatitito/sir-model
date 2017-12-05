@@ -35,8 +35,16 @@
   (from-season sample :I))
 
 
+(defn new-infections
+  [sample]
+  (let [primary (from-season sample :primary)
+        secondary (from-season sample :secondary)]
+    (map #(+ %1 %2) primary secondary)))
+
+
+
 (defn write-seasons!
-  [samples n-runs outfile]
+  [samples getter-fn outfile]
   (letfn
     [(data-for-single-season [cases sim-id]
        (let
@@ -55,7 +63,7 @@
            coll
 
            (let
-             [cases (total-infected (first from-query))
+             [cases (getter-fn (first from-query))
               csv-dat (data-for-single-season cases n)]
 
              (recur (apply conj coll csv-dat)
