@@ -12,6 +12,23 @@
     (get-in sample [:result :season])))
 
 
+(defn from-result
+  "Extracts value for key from a single sample. key must be in a result from
+  an anglican query. keys must be given in vector:
+      (from-result a-sample [:a :b])"
+  [sample keys]
+  (get-in sample (flatten [:result keys])))
+
+
+(defn from-results
+  "Extracts values for key from samples. See from-result."
+  [samples keys]
+  (reduce
+    #(conj %1 (from-result %2 keys))
+    []
+    samples))
+
+
 (defn total-infected
   "Extracts number of infected individuals for a single sample from the Model."
   [sample]
