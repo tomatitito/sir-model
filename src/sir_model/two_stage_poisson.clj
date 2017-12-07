@@ -12,8 +12,13 @@
         function). Returns updated-coll."
         [t who whom how coll]
         (let
-          [old-cases (get-in coll [t who])
-           new-cases (if (pos? old-cases) (how old-cases) 0)]
+          [max-cases (get-in coll [t :S])
+           old-cases (get-in coll [t who])
+
+           ;; there cannot be more new cases than susceptibles
+           new-cases (if (pos? old-cases)
+                       (min (how old-cases) max-cases)
+                       0)]
           (S-> t whom new-cases coll))))
 
 
@@ -94,7 +99,8 @@
         ;; before the actual simulation, progression for already
         ;; infected individuals at time 0 must be run once
         [initially-infected (get-in coll [0 :I])
-            initial-coll (progress 1 initially-infected coll)]
+         initial-coll (progress 1 initially-infected coll)]
+
         (loop [t-cur t
                coll initial-coll]
 
@@ -108,7 +114,7 @@
 (with-primitive-procedures
   [flow/create-args-coll]
   (defquery
-    dancing-query
+    two-stage-poisson-query
     [args lifetime-fn]
 
     (let
@@ -116,47 +122,9 @@
        lambda-1 (sample (:prior-1 args))
        lambda-2 (sample (:prior-2 args))
 
-       ;season-fn (fn [t r-1 r-2 coll]
-       ;            (loop [t-cur t
-       ;                   coll coll]
-       ;              (if (= t-cur (count coll))
-       ;                coll
-       ;                (recur (inc t-cur)
-       ;                       (lifetime-fn t-cur r-1 r-2 coll))))
-       ;            )
-
-       ;ans (season-fn 0 lambda-1 lambda-2 compartments)
        f #(lifetime-fn %1 lambda-1 lambda-2 %2)
-       ans (season-fn 0 compartments f)
+       season (season-fn 0 compartments f)]
 
-       ]
-
-      {:ans ans})))
+      {:season season})))
 
 
-(def arg-map
-  {:t-max        30
-   :compartments [:S :I :R :primary :secondary]
-   :inits        {:S 10000 :I 1000}
-   :prior-1      (uniform-continuous 0.2 0.4)
-   :prior-2      (uniform-continuous 0.3 0.5)
-   :params       [1 2]
-   :data         [2 1 0 3]}
-  )
-
-
-
-
-
-(def samples (doquery :lmh dancing-query [arg-map form-and-prog]))
-(first samples)
-(u/from-result (first samples) [:new 0 :S])
-
-(defn posterior
-  ([args n thin]
-   (as-> args m
-         (doquery :smc dancing-query [m] :number-of-particles 1000)
-        (take n m)
-      (take-nth thin m)))
-  ([args n]
-    (posterior args n 1)))
