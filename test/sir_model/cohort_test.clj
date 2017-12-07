@@ -48,7 +48,7 @@
 
 
 (deftest sums-at-start-of-cohort
-  (let [before-start (create-and-init-compartments-map 6 1000 100)
+  (let [before-start (create-and-init-compartments-coll 6 1000 100)
         samples (doquery :lmh sums-at-start [before-start])
         after-start (get-in (first samples) [:result :after-start])
         ]
@@ -68,7 +68,7 @@
 (deftest sums-in-progression
   (let
 
-    [init (create-and-init-compartments-map 30 10000 600)
+    [init (create-and-init-compartments-coll 30 10000 600)
      samples (doquery :lmh sums-over-time [init 10])
      compartments (get-in (first samples) [:result :compartments])]
 

@@ -19,7 +19,7 @@
       (assoc-in [0 :I] initially-infected)))
 
 
-(defn create-and-init-compartments-map
+(defn create-and-init-compartments-coll
   [timesteps n-susceptible initially-infected]
   (-> timesteps
       (create-compartments-coll)
@@ -92,7 +92,7 @@
 
 
 (with-primitive-procedures
-  [create-and-init-compartments-map]
+  [create-and-init-compartments-coll]
   (defquery
     simple-poisson-process-model
     [n-weeks prog-fn n-susceptibles initially-infected & data]
@@ -102,10 +102,10 @@
        R-0-dist (gamma shape 5)
        R-0 (sample R-0-dist)
 
-       lambda-old (sample (uniform-continuous 0.5 1.5))
-       lambda-new (sample (uniform-continuous 1.5 2.5))
+       lambda-old (sample (uniform-continuous 0.3 0.4))
+       lambda-new (sample (uniform-continuous 0.4 0.6))
        recovery-par 0.5
-       initial-coll (create-and-init-compartments-map n-weeks n-susceptibles initially-infected)
+       initial-coll (create-and-init-compartments-coll n-weeks n-susceptibles initially-infected)
 
 
        season-fn (fn season-fn [week n-weeks par-1 par-2 recov coll & data]
