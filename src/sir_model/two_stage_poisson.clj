@@ -64,7 +64,7 @@
           coll
 
           (let
-            [removed (sample (binomial cases 0.5))
+            [removed (sample (binomial cases 0.45))
              remaining (- cases removed)
 
              ;; update-rules returns a vector that has all
