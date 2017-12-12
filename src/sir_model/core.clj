@@ -13,19 +13,24 @@
 (def arg-map
   {:t-max        40
    :compartments [:S :I :R :primary :secondary]
-   :inits        {:S 60000000 :I 1000}
+   :inits        {:S 25000 :I 25}
    :prior-1      (uniform-continuous 0.4 0.9)
-   :prior-2      (uniform-continuous 1.4 2.8)
+   :prior-2      (uniform-continuous 1.5 2.5)
    })
-
-(def samples (doquery :smc model/two-stage-poisson-query [arg-map model/form-and-prog] :number-of-particles 1000))
-(def burned (take-nth 4 (take 1000 samples)))
+(def run-model #(doquery :smc model/two-stage-poisson-query [arg-map model/form-and-prog] :numerb-of-particles 1000))
+(def s-1 (.start (Thread. run-model)))
+(def s-2 (.start (Thread. run-model)))
+;(def samples (doquery :smc model/two-stage-poisson-query [arg-map model/form-and-prog] :number-of-particles 1000))
+;(def burned (take-nth 4 (take 1000 samples)))
 
 (defn -main
   "Probabilistic SIR-Model"
   [& args]
 
   (util.functions/write-seasons! burned util.functions/new-infections "data/season.csv") )
+
+(-main)
+
 
 
 
