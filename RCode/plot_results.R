@@ -2,7 +2,7 @@ library(ggplot2)
 library(dplyr)
 library(purrr)
 
-path = "data/season.csv"
+path = "data/testdat.csv"
 dat <- read.csv(path,colClasses=c("numeric", "numeric", "factor"),header=FALSE)
 
 ## dat needs three columns:
@@ -38,9 +38,17 @@ borders <- dat %>%
   map_df(~hdi( .$cases, 0.95)) %>%
   cbind(week=0:max(dat$week))
 
+mode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
 
 p <- ggplot(data=dat, aes(x=week, y=cases)) +
-  geom_point(alpha=1/10) + #geom_smooth(aes(group=1))
+  #geom_point(alpha=1/10) + #geom_smooth(aes(group=1))
+  geom_line(aes(group=sim_id), alpha=1/100) +
+  stat_summary(geom="point", fun.y=mode, color="green") +
+  stat_summary(geom="point", fun.y=mean, color="orange") +
+  stat_summary(geom="point", fun.y=median, color="blue") +
   geom_ribbon(data=borders, aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE)
 
 
