@@ -41,14 +41,6 @@
         secondary (from-season sample :secondary)]
     (map #(+ %1 %2) primary secondary)))
 
-;(def testsamples (new-infections (first sir-model.core/forced)))
-
-;; Goal:
-;; data-for-single-season should be able to return seqs of varying legths
-;; so that it can either write
-;; - values for one of the compartments (e.g. I) over the course of a season
-;; - values for multiple or all of the compartments
-;; - values that are computed from any combination of compartments (already possible!)
 
 (defmulti #^{:private true} data-for-single-season (fn [query-result f sim-id] (sequential? f)))
 
