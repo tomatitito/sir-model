@@ -44,12 +44,17 @@ mode <- function(v) {
 }
 
 p <- ggplot(data=dat, aes(x=week, y=cases)) +
-  #geom_point(alpha=1/10) + #geom_smooth(aes(group=1))
-  geom_line(aes(group=sim_id), alpha=1/100) +
+  geom_point(alpha=1/100) + #geom_smooth(aes(group=1))
+  # geom_line(aes(group=sim_id), alpha=1/10) +
   stat_summary(geom="point", fun.y=mode, color="green") +
   stat_summary(geom="point", fun.y=mean, color="orange") +
   stat_summary(geom="point", fun.y=median, color="blue") +
   geom_ribbon(data=borders, aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE)
 
+weekly_dists <- ggplot(data=dat, aes(cases)) +
+  geom_histogram() +
+  facet_wrap(~ week, ncol=8, scales="free")
 
-ggsave(file="season.pdf")
+
+ggsave(file="season.pdf", plot=p)
+ggsave(file="weekly_dists.pdf", plot=weekly_dists, height=9, width=11)
