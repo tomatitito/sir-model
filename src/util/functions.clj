@@ -41,20 +41,37 @@
         secondary (from-season sample :secondary)]
     (map #(+ %1 %2) primary secondary)))
 
+;(def testsamples (new-infections (first sir-model.core/forced)))
+
+;; Goal:
+;; data-for-single-season should be able to return seqs of varying legths
+;; so that it can either write
+;; - values for one of the compartments (e.g. I) over the course of a season
+;; - values for multiple or all of the compartments
+;; - values that are computed from any combination of compartments (already possible!)
+
+(defmulti #^{:private true} data-for-single-season (fn [cases sim-id] (sequential? (first cases))))
+
+(defmethod data-for-single-season false [cases sim-id]
+  (let
+    [weeks (range (count cases))
+     sim-ids (repeat (count cases) sim-id)]
+
+    (partition 3
+               (interleave weeks cases sim-ids))))
+
+;; testing fn on small sample
+(def new-I (new-infections (first sir-model.core/forced)))
+(data-for-single-season new-I 0)
+
+
+
 
 
 (defn write-seasons!
   [samples getter-fn outfile]
   (letfn
-    [(data-for-single-season [cases sim-id]
-       (let
-         [weeks (range (count cases))
-          sim-ids (repeat (count cases) sim-id)]
-
-         (partition 3
-                    (interleave weeks cases sim-ids))))
-
-     (csv-data [samples]
+    [(csv-data [samples]
        (loop [coll []
               from-query samples
               n 0]
@@ -72,3 +89,6 @@
 
     (with-open [writer (io/writer outfile)]
       (csv/write-csv writer (csv-data samples)))))
+
+;; testing on small sample
+(write-seasons! sir-model.core/forced new-infections "data/multi.csv")
