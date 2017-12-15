@@ -50,21 +50,20 @@
 ;; - values for multiple or all of the compartments
 ;; - values that are computed from any combination of compartments (already possible!)
 
-(defmulti #^{:private true} data-for-single-season (fn [cases sim-id] (sequential? (first cases))))
+(defmulti #^{:private true} data-for-single-season (fn [query-result f sim-id] (sequential? f)))
 
-(defmethod data-for-single-season false [cases sim-id]
+(defmethod data-for-single-season false [query-result f sim-id]
   (let
-    [weeks (range (count cases))
-     sim-ids (repeat (count cases) sim-id)]
+    [weeks (range (count (from-result query-result :season)))
+     cases (f query-result)
+     sim-ids (repeat (count weeks) sim-id)]
 
     (partition 3
                (interleave weeks cases sim-ids))))
 
-;; testing fn on small sample
-(def new-I (new-infections (first sir-model.core/forced)))
-(data-for-single-season new-I 0)
-
-
+;;; testing fn on small sample
+;(def new-I (new-infections (first sir-model.core/forced)))
+(data-for-single-season (first sir-model.core/forced) new-infections 0)
 
 
 
@@ -80,8 +79,11 @@
            coll
 
            (let
-             [cases (getter-fn (first from-query))
-              csv-dat (data-for-single-season cases n)]
+             [
+              ;cases (getter-fn (first from-query))
+              single-sample (first from-query)
+              csv-dat (data-for-single-season single-sample getter-fn n)
+              ]
 
              (recur (apply conj coll csv-dat)
                     (rest from-query)
