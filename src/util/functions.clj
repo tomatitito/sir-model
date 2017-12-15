@@ -74,7 +74,7 @@
 
 
 (defn write-seasons!
-  [samples getter-fn outfile]
+  [samples getter-fn outfile & header]
   (letfn
     [(csv-data [samples]
        (loop [coll []
@@ -85,18 +85,17 @@
            coll
 
            (let
-             [
-              ;cases (getter-fn (first from-query))
-              single-sample (first from-query)
-              csv-dat (data-for-single-season single-sample getter-fn n)
-              ]
+             [single-sample (first from-query)
+              csv-dat (data-for-single-season single-sample getter-fn n)]
 
              (recur (apply conj coll csv-dat)
                     (rest from-query)
                     (inc n))))))]
 
     (with-open [writer (io/writer outfile)]
+      (when header
+        (csv/write-csv writer header))
       (csv/write-csv writer (csv-data samples)))))
 
 ;; testing on small sample
-(write-seasons! sir-model.core/forced [new-infections total-infected] "data/multi.csv")
+(write-seasons! sir-model.core/forced [new-infections total-infected] "data/multi.csv" ["V1" "V2"])
