@@ -53,8 +53,6 @@
     (partition 3
                (interleave weeks cases sim-ids))))
 
-;;; testing fn on small sample
-;(data-for-single-season (first sir-model.core/forced) new-infections 0)
 
 (defmethod data-for-single-season true [query-result f sim-id]
   (let
@@ -68,9 +66,6 @@
           (interleave weeks v sim-ids)
           (flatten v)
           (partition (+ (count cases) 2) v))))
-
-(data-for-single-season (first sir-model.core/forced) [new-infections total-infected] 42)
-
 
 
 (defn write-seasons!
@@ -96,6 +91,3 @@
       (when header
         (csv/write-csv writer header))
       (csv/write-csv writer (csv-data samples)))))
-
-;; testing on small sample
-(write-seasons! sir-model.core/forced [new-infections total-infected] "data/multi.csv" ["V1" "V2"])

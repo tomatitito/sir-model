@@ -47,6 +47,7 @@
      [macro-model# (:name (meta (var ~anglican-query)))]
      (str macro-model#)))
 
+;; TODO: compute path
 
 (defn -main
   "Probabilistic SIR-Model"
@@ -62,21 +63,7 @@
            #(util.functions/from-season % :R)
            #(util.functions/from-season % :primary)
            #(util.functions/from-season % :secondary)]
-     path "data/multi.csv"]
+     path "data/multi.csv"
+     header ["week" "new" "S" "I" "R" "primary" "secondary" "sim_id"]]
 
-    (util.functions/write-seasons! samples getter-fns path)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    (util.functions/write-seasons! samples getter-fns path header)))
