@@ -58,9 +58,9 @@
   [population initially-infected n-runs & thin]
 
   (let
-    [args (assoc arg-map :inits {:S (Integer/parseInt population) :I (Integer/parseInt initially-infected)})
-     thin-par (if thin (Integer/parseInt (first thin)) 1)
-     samples (sampler model/two-stage-poisson-query args (Integer/parseInt n-runs) thin-par)
+    [args (assoc arg-map :inits {:S population :I initially-infected})
+     thin-par (if thin (first thin) 1)
+     samples (sampler model/two-stage-poisson-query args n-runs thin-par)
      getter-fns [util.functions/new-infections
            #(util.functions/from-season % :S)
            #(util.functions/from-season % :I)
@@ -74,4 +74,4 @@
 
     (util.functions/write-seasons! samples getter-fns path header)))
 
-;(time (-main "100" '"1" "50" "4"))
+;(time (-main 100 1 50 4))
