@@ -1,5 +1,5 @@
-(defproject sir-model "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
+(defproject sir-model "0.1.0"
+  :description "An implementation of a probabillistic version of the SIR-model."
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
