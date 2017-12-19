@@ -47,7 +47,11 @@
      [macro-model# (:name (meta (var ~anglican-query)))]
      (str macro-model#)))
 
-;; TODO: compute path
+(defn compute-filename [args]
+  [(.toString (java.time.LocalDateTime/now))
+   "two-stage-poisson-query"
+   (get-in args [:inits :S])
+   (get-in args [:inits :I])])
 
 (defn -main
   "Probabilistic SIR-Model"
@@ -63,9 +67,11 @@
            #(util.functions/from-season % :R)
            #(util.functions/from-season % :primary)
            #(util.functions/from-season % :secondary)]
-     path "data/uberjartest.csv"
+     filename (clojure.string/join "_" (conj (compute-filename args) n-runs))
+     filedir "data"
+     path (str filedir "/" filename " .csv")
      header ["week" "new" "S" "I" "R" "primary" "secondary" "sim_id"]]
 
     (util.functions/write-seasons! samples getter-fns path header)))
 
-;(time (-main 100 1 50 4))
+;(time (-main "100" '"1" "50" "4"))
