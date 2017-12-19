@@ -69,7 +69,7 @@
            #(util.functions/from-season % :secondary)]
      filename (clojure.string/join "_" (conj (compute-filename args) n-runs))
      filedir "data"
-     path (str filedir "/" filename " .csv")
+     path (str filedir "/" filename ".csv")
      header ["week" "new" "S" "I" "R" "primary" "secondary" "sim_id"]]
 
     (util.functions/write-seasons! samples getter-fns path header)))
