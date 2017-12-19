@@ -1,4 +1,4 @@
-(ns sir-modell.functions
+(ns sir-model.functions
   (:use [anglican core runtime emit]
         anglican-code.distributions
         anglican-code.queries

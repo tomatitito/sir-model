@@ -1,4 +1,4 @@
-(ns sir-modell.datastructures
+(ns sir-model.datastructures
   (:use [anglican [core :exclude [-main]] runtime emit]
         anglican-code.queries))
 

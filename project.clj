@@ -11,6 +11,7 @@
                  [proto-repl-sayid "0.1.3"]
                  [anglican "1.0.0"]
                  [lein-gorilla "0.4.0"]]
-  :main ^:skip-aot sir-model.core
+  :main sir-model.core
+  :aot [sir-model.core]
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
