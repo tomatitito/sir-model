@@ -1,9 +1,10 @@
 library(ggplot2)
 library(dplyr)
 library(purrr)
+library(scales)
 
 path = "data/testdat.csv"
-dat <- read.csv(path,colClasses=c("numeric", "numeric", "factor"),header=FALSE)
+dat <- read.csv(path,colClasses=c("numeric", "numeric","factor"),header=FALSE)
 
 ## dat needs three columns:
 ## week, cases, simulation-index
@@ -43,18 +44,72 @@ mode <- function(v) {
   uniqv[which.max(tabulate(match(v, uniqv)))]
 }
 
-p <- ggplot(data=dat, aes(x=week, y=cases)) +
+# Multiple plot function
+# from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+  if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+p_new <- ggplot(data=dat, aes(x=week, y=cases)) +
   geom_point(alpha=1/100) + #geom_smooth(aes(group=1))
   # geom_line(aes(group=sim_id), alpha=1/10) +
-  stat_summary(geom="point", fun.y=mode, color="green") +
+  stat_summary(geom="point", fun.y=mode, color="magenta") +
   stat_summary(geom="point", fun.y=mean, color="orange") +
-  stat_summary(geom="point", fun.y=median, color="blue") +
-  geom_ribbon(data=borders, aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE)
+  stat_summary(geom="point", fun.y=median, color="green") +
+  geom_ribbon(data=borders, aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE) +
+  scale_y_continuous(labels = comma) +
+  labs(title="Simulierte Neuerkrankungen ueber 40 Wochen", x="Woche", y="Neuerkrankungen") +
+  annotate("text", color="magenta", label="mode", x=39, y=400000) +
+  annotate("text", color="orange", label="mean", x=39, y=380000) +
+  annotate("text", color="green", label="median", x=39.3, y=360000)
 
 weekly_dists <- ggplot(data=dat, aes(cases)) +
   geom_histogram() +
-  facet_wrap(~ week, ncol=8, scales="free")
+  facet_wrap(~ week, ncol=7, scales="free") +
+  theme(axis.text.x=element_text(size=5)) +
+  labs(title="Verteilung der simulierten Neuerkrankungen pro Woche")
 
-
-ggsave(file="season.pdf", plot=p)
+print(max(as.numeric(dat$sim_id)))
+ggsave(file="season.pdf", plot=p_new, height=5, width=10)
 ggsave(file="weekly_dists.pdf", plot=weekly_dists, height=9, width=11)
