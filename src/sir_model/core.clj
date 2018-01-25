@@ -43,9 +43,11 @@
   ([query-results n]
    (pmap-samples query-results n 1))
   ([query-results n thin]
-   ;; if no logging to screen is needed, use the commented version
-   ;(pmap #(nth query-result %) (range 0 n thin))
-   (cp/upmap 6 #(force-sample query-results %) (range 0 n thin))))
+   (let [n-cpus (.. Runtime getRuntime availableProcessors)
+         n-threads (+ n-cpus 2)]
+     ;; if no logging to screen is needed, use the commented version
+     ;(pmap #(nth query-result %) (range 0 n thin))
+     (cp/upmap n-threads #(force-sample query-results %) (range 0 n thin)))))
 
 
 (defn sampler
