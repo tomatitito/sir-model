@@ -1,6 +1,7 @@
 (ns sir-model.two-stage-poisson
   (:require [util.functions :as u]
-            [sir-model.dataflow :as flow])
+            [sir-model.dataflow :as flow]
+            [clojure.tools.logging :as log])
   (:use [anglican [core :exclude [-main]] runtime emit]))
 
 
@@ -83,6 +84,7 @@
 (with-primitive-procedures
   [flow/cohort-size]
   (defm form-and-prog
+        "Formation and Progression of a cohort."
         [t l-1 l-2 coll]
         ((comp
            #(progress (inc t) (cohort-size t %) %)
@@ -92,14 +94,17 @@
 
 (defm season-fn
       "Generic function for simulating an influenza season. Takes a starting-timestep,
-      a lifetime-fn and a collection of compartments. lifetime-fn has to be a function
-      that expects two arguments, the timestep and and collection."
+      a collection of compartments and a lifetime-fn. timestep and collection are
+      arguments for lifetime-fn. This of course means that lifetime-fn has to be a
+      function that expects two arguments, the timestep and and collection."
       [t coll lifetime-fn]
+
       (let
         ;; before the actual simulation, progression for already
         ;; infected individuals at time 0 must be run once
         [initially-infected (get-in coll [0 :I])
          initial-coll (progress 1 initially-infected coll)]
+
 
         (loop [t-cur t
                coll initial-coll]
@@ -108,7 +113,19 @@
             coll
 
             (recur (inc t-cur)
-                   (lifetime-fn t-cur coll))))))
+                   (lifetime-fn t-cur coll)))))
+      ;(let
+      ;  [initially-infected (get-in coll [0 :I])
+      ;   initial-coll (progress 1 initially-infected coll)]
+      ;  (cond
+      ;    (= t (count initial-coll)) initial-coll
+      ;    (= t 0) (do (println "LOG: starting season") (season-fn (inc t) (lifetime-fn t initial-coll) lifetime-fn))
+      ;    :else (season-fn (inc t) (lifetime-fn t initial-coll) lifetime-fn)
+      ;
+      ;    ;(let [updated-coll (lifetime-fn t initial-coll)]
+      ;    ;  (season-fn (inc t) updated-coll lifetime-fn))
+      ;    ))
+      )
 
 
 (with-primitive-procedures
@@ -124,6 +141,7 @@
 
        f #(lifetime-fn %1 lambda-1 lambda-2 %2)
        season (season-fn 0 compartments f)]
+
 
       {:season season})))
 

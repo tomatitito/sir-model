@@ -4,6 +4,7 @@
             [clojure.data.csv :as csv]
             [util.functions :as util]
             [sir-model.two-stage-poisson :as model]
+            [com.climate.claypoole :as cp]
             )
   (:use [anglican [core :exclude [-main]] runtime emit stat]))
 
@@ -19,26 +20,40 @@
    })
 
 
+(def counter (agent 0))
+(add-watch counter :watcher
+           (fn [key agent old-state new-state]
+             (println "watcher: just started" new-state)))
+
+
+(defn force-sample
+  [query-results n]
+  (send counter inc)
+  (nth query-results n))
+
+
 (defn lazy-samples
   "Takes an anglican query and returns samples as a lazy-seq."
   [anglican-query args]
   (doquery :smc anglican-query [args model/form-and-prog] :number-of-particles 1000))
 
 
-(defn force-samples
+(defn pmap-samples
   "Takes the result from an anglican doquery and an optional thinning parameter
   and extracts n elements out of that lazy-seq."
   ([query-results n]
-   (force-samples query-results n 1))
-  ([query-result n thin]
-   (pmap #(nth query-result %) (range 0 n thin))))
+   (pmap-samples query-results n 1))
+  ([query-results n thin]
+   ;; if no logging to screen is needed, use the commented version
+   ;(pmap #(nth query-result %) (range 0 n thin))
+   (cp/upmap 6 #(force-sample query-results %) (range 0 n thin))))
 
 
 (defn sampler
   [anglican-query args n thin]
   (-> anglican-query
       (lazy-samples args)
-      (force-samples n thin)))
+      (pmap-samples n thin)))
 
 
 (defmacro query-string
@@ -47,11 +62,13 @@
      [macro-model# (:name (meta (var ~anglican-query)))]
      (str macro-model#)))
 
+
 (defn compute-filename [args]
   [(.toString (java.time.LocalDateTime/now))
    "two-stage-poisson-query"
    (get-in args [:inits :S])
    (get-in args [:inits :I])])
+
 
 (defn -main
   "Probabilistic SIR-Model"
@@ -74,4 +91,5 @@
 
     (util.functions/write-seasons! samples getter-fns path header)))
 
-;(time (-main 100 1 50 4))
+;(time (-main 1000 1 50  ))
+

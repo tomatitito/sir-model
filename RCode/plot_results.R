@@ -3,8 +3,8 @@ library(dplyr)
 library(purrr)
 library(scales)
 
-path = "data/testdat.csv"
-dat <- read.csv(path,colClasses=c("numeric", "numeric","factor"),header=FALSE)
+path = "data/2018-01-25T12:27:26.540_two-stage-poisson-query_1000000_1000_5000.csv"
+dat <- read.csv(path,colClasses=c("numeric", "numeric","factor"),header=TRUE)
 
 ## dat needs three columns:
 ## week, cases, simulation-index
@@ -111,5 +111,5 @@ weekly_dists <- ggplot(data=dat, aes(cases)) +
   labs(title="Verteilung der simulierten Neuerkrankungen pro Woche")
 
 print(max(as.numeric(dat$sim_id)))
-ggsave(file="season.pdf", plot=p_new, height=5, width=10)
-ggsave(file="weekly_dists.pdf", plot=weekly_dists, height=9, width=11)
+ggsave(file="season_test.pdf", plot=p_new, height=5, width=10)
+ggsave(file="weekly_dists_test.pdf", plot=weekly_dists, height=9, width=11)
