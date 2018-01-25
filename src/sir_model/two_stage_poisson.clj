@@ -1,7 +1,6 @@
 (ns sir-model.two-stage-poisson
   (:require [util.functions :as u]
-            [sir-model.dataflow :as flow]
-            [clojure.tools.logging :as log])
+            [sir-model.dataflow :as flow])
   (:use [anglican [core :exclude [-main]] runtime emit]))
 
 
