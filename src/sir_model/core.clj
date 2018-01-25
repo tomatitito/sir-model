@@ -4,8 +4,7 @@
             [clojure.data.csv :as csv]
             [util.functions :as util]
             [sir-model.two-stage-poisson :as model]
-            [com.climate.claypoole :as cp]
-            )
+            [com.climate.claypoole :as cp])
   (:use [anglican [core :exclude [-main]] runtime emit stat]))
 
 
@@ -23,7 +22,7 @@
 (def counter (agent 0))
 (add-watch counter :watcher
            (fn [key agent old-state new-state]
-             (println "watcher: just started" new-state)))
+             (println "sir-model.core: just started simulation" new-state)))
 
 
 (defn force-sample
