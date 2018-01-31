@@ -22,6 +22,7 @@
                        0)]
           (S-> t whom new-cases coll))))
 
+
 (with-primitive-procedures
   [d/fast-poisson]
   (defm generate-poisson
@@ -31,9 +32,7 @@
         (let [lambda* (* N lambda)]
           (if (> lambda* 30)
             (sample (fast-poisson lambda*))
-            (sample (poisson lambda*))
-            ))
-        ))
+            (sample (poisson lambda*))))))
 
 
 (defm primary-poisson
