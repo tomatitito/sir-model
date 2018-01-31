@@ -12,3 +12,6 @@ pom.xml.asc
 *.swp
 *.iml
 *.xml
+
+*.csv
+*.pdf
