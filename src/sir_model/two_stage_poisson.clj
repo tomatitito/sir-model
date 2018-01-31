@@ -1,5 +1,6 @@
 (ns sir-model.two-stage-poisson
   (:require [util.functions :as u]
+            [anglican-code.distributions :as d]
             [sir-model.dataflow :as flow])
   (:use [anglican [core :exclude [-main]] runtime emit]))
 
@@ -21,12 +22,18 @@
                        0)]
           (S-> t whom new-cases coll))))
 
-
-(defm generate-poisson
-      [N lambda]
-      "Draws a sample from the distribution of new infections given parameter lambda and number of already
-      infected individuals."
-      (sample (poisson (* N lambda))))
+(with-primitive-procedures
+  [d/fast-poisson]
+  (defm generate-poisson
+        [N lambda]
+        "Draws a sample from the distribution of new infections given parameter lambda and number of already
+        infected individuals."
+        (let [lambda* (* N lambda)]
+          (if (> lambda* 30)
+            (sample (fast-poisson lambda*))
+            (sample (poisson lambda*))
+            ))
+        ))
 
 
 (defm primary-poisson
@@ -112,19 +119,7 @@
             coll
 
             (recur (inc t-cur)
-                   (lifetime-fn t-cur coll)))))
-      ;(let
-      ;  [initially-infected (get-in coll [0 :I])
-      ;   initial-coll (progress 1 initially-infected coll)]
-      ;  (cond
-      ;    (= t (count initial-coll)) initial-coll
-      ;    (= t 0) (do (println "LOG: starting season") (season-fn (inc t) (lifetime-fn t initial-coll) lifetime-fn))
-      ;    :else (season-fn (inc t) (lifetime-fn t initial-coll) lifetime-fn)
-      ;
-      ;    ;(let [updated-coll (lifetime-fn t initial-coll)]
-      ;    ;  (season-fn (inc t) updated-coll lifetime-fn))
-      ;    ))
-      )
+                   (lifetime-fn t-cur coll))))))
 
 
 (with-primitive-procedures
