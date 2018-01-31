@@ -52,7 +52,7 @@
         (recur (helper b a))))))
 
 
-(defn fast-poisson [lambda]
+(defn sample-fast-poisson [lambda]
   (let
     [;; helper functions
      beta-f (fn [lambda]
@@ -93,4 +93,22 @@
 
         (recur (propose lambda b a))))))
 
-(fast-poisson 5000000)
+
+(defdist fast-poisson
+         "This implementation uses an algorithm described by Atkinson (1979) to sample
+         from the poisson distribution. Runtime is independent of the size of lambda,
+         which is needed for the SIR-model."
+         [lambda]
+         []
+         (sample* [this]
+                  (sample-fast-poisson lambda))
+         (observe* [this value] (observe* (poisson lambda) value)))
+
+(with-primitive-procedures
+  [fast-poisson]
+  (defquery fast [lambda]
+            (let [x (sample (fast-poisson lambda))]
+              (observe (fast-poisson lambda) 1000)
+              {:x x})))
+
+(take 1 (doquery :lmh fast [40]))
