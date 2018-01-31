@@ -42,7 +42,7 @@
                   (-
                     a
                     (/
-                      (log (- 1.0 u))
+                      (log (- 1 u))
                       u))
                   b)))]
 
@@ -58,7 +58,7 @@
      beta-f (fn [lambda]
               (/
                 Math/PI
-                (sqrt (* 3.0 lambda))))
+                (sqrt (* 3 lambda))))
      alpha-f (fn [lambda b]
                (* lambda b))
 
@@ -68,12 +68,7 @@
      c (- 0.767 (/ 3.36 lambda))
      k (- (- (log c) lambda) (log b))
 
-     ;; stage 1: proposal
-     ;; move this into a loop/recur block
-     x (propose lambda b a)
-     n (floor (+ x 0.5))
-
-     ;; stage 2: functions for rejection sampling
+     ;; functions for rejection sampling
      lhs (fn [x]
            (let
              [v (sample* (uniform-continuous 0 1))
@@ -83,16 +78,19 @@
                (log
                  (/
                    v
-                   (pow (+ 1.0 (exp y)) 2))))))
+                   (pow (+ 1 (exp y)) 2))))))
 
      rhs (fn [n]
            (-
              (+ k (* n (log lambda)))
-             (log-gamma-fn (inc n))))
-     ]
+             (log-gamma-fn (inc n))))]
 
+    ;; rejection sampling
     (loop [x (propose lambda b a)]
+
       (if (<= (lhs x) (rhs (floor (+ x 0.5))))
-        (floor (+ x 0.5))
-        (recur (propose lambda b a)))
-      )))
+        (int (floor (+ x 0.5)))
+
+        (recur (propose lambda b a))))))
+
+(fast-poisson 5000000)
