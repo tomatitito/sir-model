@@ -3,12 +3,16 @@ library(dplyr)
 library(purrr)
 library(scales)
 
-path = "data/2018-01-25T12:27:26.540_two-stage-poisson-query_1000000_1000_5000.csv"
-dat <- read.csv(path,colClasses=c("numeric", "numeric","factor"),header=TRUE)
+path = "data/2018-01-31T22:37:09.770_two-stage-poisson-query_80000000_5000_1000.csv"
+# dat <- read.csv(path,colClasses=c("numeric", "numeric","factor"),header=TRUE)
+dat <- read.csv(path,colClasses="numeric",header=TRUE) %>% mutate(cases=new )
 
-## dat needs three columns:
-## week, cases, simulation-index
-names(dat) <- c("week", "cases", "sim_id")
+# ## older versions of dat need three columns:
+# ## week, cases, simulation-index
+# ## newer versions need more
+# namesShort <- c("week", "cases", "sim_id")
+# namesLong <- c("week", "cases", "S", "I", "R", "primary", "secondary", "sim_id")
+# names(dat) <- namesLong
 
 hdi = function( sampleVec , credMass=0.95 ) {
   # Computes highest density interval from a sample of representative values,
@@ -34,6 +38,7 @@ hdi = function( sampleVec , credMass=0.95 ) {
   return( HDIlim )
 }
 
+## SOMETHING WRONG HERE
 borders <- dat %>%
   split(.$week) %>%
   map_df(~hdi( .$cases, 0.95)) %>%
@@ -97,7 +102,7 @@ p_new <- ggplot(data=dat, aes(x=week, y=cases)) +
   stat_summary(geom="point", fun.y=mode, color="magenta") +
   stat_summary(geom="point", fun.y=mean, color="orange") +
   stat_summary(geom="point", fun.y=median, color="green") +
-  geom_ribbon(data=borders, aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE) +
+  # geom_ribbon(data=borders, aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE) +
   scale_y_continuous(labels = comma) +
   labs(title="Simulierte Neuerkrankungen ueber 40 Wochen", x="Woche", y="Neuerkrankungen") +
   annotate("text", color="magenta", label="mode", x=39, y=400000) +
