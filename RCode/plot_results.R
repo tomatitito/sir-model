@@ -71,10 +71,11 @@ p_new <- ggplot(data=dat, aes(x=week, y=cases)) +
   labs(title="Simulierte Neuerkrankungen ueber 40 Wochen", x="Woche", y="Neuerkrankungen") +
   geom_line(data=stats_wide, aes(x=1:nrow(stats_wide),y=means, color="mean"), inherit.aes=FALSE) +
   geom_line(data=stats_wide, aes(x=1:nrow(stats_wide),y=medians, color="median"), inherit.aes=FALSE) +
-  geom_line(data=stats_wide, aes(x=1:nrow(stats_wide),y=modes, color="mode"), inherit.aes=FALSE) 
+  geom_line(data=stats_wide, aes(x=1:nrow(stats_wide),y=modes, color="mode"), inherit.aes=FALSE) +
+  theme(legend.title=element_blank())
 
 p_stats <- ggplot(stats_long, aes(x=week,y=val, color=stat)) + geom_point(show.legend=FALSE) +
-  facet_grid(stat ~ .) +
+  facet_grid(stat ~ ., scales="free") +
   theme(axis.title.x=element_blank(), axis.title.y=element_blank())
 
 weekly_dists <- ggplot(data=dat, aes(cases)) +
@@ -89,7 +90,7 @@ weekly_dists_free <- ggplot(data=dat, aes(cases)) +
   theme(axis.text.x=element_text(size=5)) +
   labs(title="Verteilung der simulierten Neuerkrankungen pro Woche")
 
-ggsave(file="season_test.pdf", plot=p_new, height=5, width=10)
-ggsave(file="stats_test.pdf", plot=p_stats, height=2.5, width=7)
-ggsave(file="weekly_dists_test.pdf", plot=weekly_dists, height=9, width=11)
-ggsave(file="weekly_dists_free_test.pdf", plot=weekly_dists_free, height=9, width=11)
+ggsave(file="season.pdf", plot=p_new, height=5, width=10)
+ggsave(file="stats.pdf", plot=p_stats, height=2.5, width=7)
+ggsave(file="weekly_dists.pdf", plot=weekly_dists, height=9, width=11)
+ggsave(file="weekly_dists_free.pdf", plot=weekly_dists_free, height=9, width=11)
