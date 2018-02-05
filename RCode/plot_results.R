@@ -5,17 +5,18 @@ library(scales)
 
 args <- commandArgs(TRUE)
 
-#path = "data/2018-01-31T22:37:09.770_two-stage-poisson-query_80000000_5000_1000.csv"
-path <- args[1]
-# dat <- read.csv(path,colClasses=c("numeric", "numeric","factor"),header=TRUE)
-dat <- read.csv(path,colClasses="numeric",header=TRUE) %>% mutate(cases=new )
-
 ## NOTE: when naming cols or changing types 
 ##the way the data looks has changed
 ## older versions have three columns:
 ## week, cases, simulation-index
 ## newer versions have more
 ## week, new, S, I, R, primary, secondary, sim_id
+
+#path = "data/2018-01-31T22:37:09.770_two-stage-poisson-query_80000000_5000_1000.csv"
+path <- args[1]
+# dat <- read.csv(path,colClasses=c("numeric", "numeric","factor"),header=TRUE)
+dat <- read.csv(path,colClasses="numeric",header=TRUE) %>% mutate(cases=new )
+
 
 hdi = function( sampleVec , credMass=0.95 ) {
   # Computes highest density interval from a sample of representative values,
@@ -41,7 +42,6 @@ hdi = function( sampleVec , credMass=0.95 ) {
   return( HDIlim )
 }
 
-## SOMETHING WRONG HERE
 borders <- dat %>%
   split(.$week) %>%
   map_df(~hdi( .$cases, 0.95)) %>%
@@ -51,6 +51,18 @@ mode <- function(v) {
   uniqv <- unique(v)
   uniqv[which.max(tabulate(match(v, uniqv)))]
 }
+
+# for mean, mode and median
+compute_stat = function(df, f){
+  df %>%
+    split(.$week) %>%
+    map_dbl(~f(.$new)) 
+}
+
+# layer data for aggregate statistics
+stats = data.frame(means=compute_stat(dat, mean), medians=compute_stat(dat, median), modes=compute_stat(dat, mode))
+print(head(stats))
+print(str(stats))
 
 # Multiple plot function
 # from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
@@ -102,15 +114,18 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 p_new <- ggplot(data=dat, aes(x=week, y=cases)) +
   geom_point(alpha=1/100) + #geom_smooth(aes(group=1))
   # geom_line(aes(group=sim_id), alpha=1/10) +
-  stat_summary(geom="point", fun.y=mode, color="magenta") +
-  stat_summary(geom="point", fun.y=mean, color="orange") +
-  stat_summary(geom="point", fun.y=median, color="green") +
+  #stat_summary(geom="point", fun.y=mode, color="magenta") +
+  #stat_summary(geom="point", fun.y=mean, color="orange") +
+  #stat_summary(geom="point", fun.y=median, color="green") +
   geom_ribbon(data=borders, aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE) +
   scale_y_continuous(labels = comma) +
   labs(title="Simulierte Neuerkrankungen ueber 40 Wochen", x="Woche", y="Neuerkrankungen") +
-  annotate("text", color="magenta", label="mode", x=39, y=400000) +
-  annotate("text", color="orange", label="mean", x=39, y=380000) +
-  annotate("text", color="green", label="median", x=39.3, y=360000)
+  #annotate("text", color="magenta", label="mode", x=39, y=400000) +
+  #annotate("text", color="orange", label="mean", x=39, y=380000) +
+  #annotate("text", color="green", label="median", x=39.3, y=360000) + 
+  geom_line(data=stats, aes(x=1:nrow(stats),y=means, color="mean"), inherit.aes=FALSE) +
+  geom_line(data=stats, aes(x=1:nrow(stats),y=medians, color="median"), inherit.aes=FALSE) +
+  geom_line(data=stats, aes(x=1:nrow(stats),y=modes, color="mode"), inherit.aes=FALSE) 
 
 weekly_dists <- ggplot(data=dat, aes(cases)) +
   geom_histogram() +
