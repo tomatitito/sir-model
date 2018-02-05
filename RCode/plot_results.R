@@ -3,16 +3,19 @@ library(dplyr)
 library(purrr)
 library(scales)
 
-path = "data/2018-01-31T22:37:09.770_two-stage-poisson-query_80000000_5000_1000.csv"
+args <- commandArgs(TRUE)
+
+#path = "data/2018-01-31T22:37:09.770_two-stage-poisson-query_80000000_5000_1000.csv"
+path <- args[1]
 # dat <- read.csv(path,colClasses=c("numeric", "numeric","factor"),header=TRUE)
 dat <- read.csv(path,colClasses="numeric",header=TRUE) %>% mutate(cases=new )
 
-# ## older versions of dat need three columns:
-# ## week, cases, simulation-index
-# ## newer versions need more
-# namesShort <- c("week", "cases", "sim_id")
-# namesLong <- c("week", "cases", "S", "I", "R", "primary", "secondary", "sim_id")
-# names(dat) <- namesLong
+## NOTE: when naming cols or changing types 
+##the way the data looks has changed
+## older versions have three columns:
+## week, cases, simulation-index
+## newer versions have more
+## week, new, S, I, R, primary, secondary, sim_id
 
 hdi = function( sampleVec , credMass=0.95 ) {
   # Computes highest density interval from a sample of representative values,
@@ -102,7 +105,7 @@ p_new <- ggplot(data=dat, aes(x=week, y=cases)) +
   stat_summary(geom="point", fun.y=mode, color="magenta") +
   stat_summary(geom="point", fun.y=mean, color="orange") +
   stat_summary(geom="point", fun.y=median, color="green") +
-  # geom_ribbon(data=borders, aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE) +
+  geom_ribbon(data=borders, aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE) +
   scale_y_continuous(labels = comma) +
   labs(title="Simulierte Neuerkrankungen ueber 40 Wochen", x="Woche", y="Neuerkrankungen") +
   annotate("text", color="magenta", label="mode", x=39, y=400000) +
