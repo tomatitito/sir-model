@@ -4,6 +4,7 @@
             [clojure.data.csv :as csv]
             [util.functions :as util]
             [sir-model.two-stage-poisson :as model]
+            [sir-model.framework :as f]
             [com.climate.claypoole :as cp])
   (:use [anglican [core :exclude [-main]] runtime emit stat]))
 
@@ -78,7 +79,7 @@
   (let
     [args (assoc arg-map :inits {:S population :I initially-infected})
      thin-par (if thin (first thin) 1)
-     samples (sampler model/two-stage-poisson-query args n-runs thin-par)
+     samples (sampler f/sir-query args n-runs thin-par)
      getter-fns [util.functions/new-infections
            #(util.functions/from-season % :S)
            #(util.functions/from-season % :I)
@@ -92,6 +93,6 @@
 
     (util.functions/write-seasons! samples getter-fns path header)))
 
-;;(time (-main 80000000 5000 1000 4))
+;(time (-main 100000 10 1000))
 
 
