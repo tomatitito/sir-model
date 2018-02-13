@@ -33,20 +33,3 @@
                    (lifetime-fn t-cur coll))))))
 
 
-(with-primitive-procedures
-  [flow/create-args-coll]
-  (defquery
-    sir-query
-    ;two-stage-poisson-query
-    [args lifetime-fn]
-
-    (let
-      [compartments (create-args-coll (:t-max args) (:compartments args) (:inits args))
-       lambda-1 (sample (:prior-1 args))
-       lambda-2 (sample (:prior-2 args))
-
-       f #(lifetime-fn %1 lambda-1 lambda-2 %2)
-       season (season-fn 0 compartments f)]
-
-
-      {:season season})))
