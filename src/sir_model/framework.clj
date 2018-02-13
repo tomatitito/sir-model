@@ -41,7 +41,7 @@
     [args lifetime-fn]
 
     (let
-      [compartments (flow/create-args-coll (:t-max args) (:compartments args) (:inits args))
+      [compartments (create-args-coll (:t-max args) (:compartments args) (:inits args))
        lambda-1 (sample (:prior-1 args))
        lambda-2 (sample (:prior-2 args))
 
