@@ -34,7 +34,7 @@
 (defn lazy-samples
   "Takes an anglican query and returns samples as a lazy-seq."
   [anglican-query args]
-  (doquery :smc anglican-query [args model/form-and-prog] :number-of-particles 1000))
+  (doquery :smc anglican-query [args] :number-of-particles 1000))
 
 
 (defn pmap-samples
@@ -92,6 +92,6 @@
 
     (util.functions/write-seasons! samples getter-fns path header)))
 
-(time (-main 100000 10 10))
+(time (-main 100000 10 1000))
 
 

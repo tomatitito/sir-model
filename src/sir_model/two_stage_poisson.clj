@@ -1,6 +1,7 @@
 (ns sir-model.two-stage-poisson
   (:require [anglican-code.distributions :as d]
-            [sir-model.dataflow :as flow])
+            [sir-model.dataflow :as flow]
+            [sir-model.framework :as fw])
   (:use [anglican [core :exclude [-main]] runtime emit]))
 
 
@@ -85,6 +86,15 @@
             (progress (inc t) remaining updated-coll)))))
 
 
+(defm init-compartments
+      "Before the actual simulation, progression for already infected individuals at time 0 must be run once.
+      Neccessary for correctness of the number of individuals over the course of the simulation."
+      [coll]
+      (let
+        [initially-infected (get-in coll [0 :I])]
+        (progress 1 initially-infected coll)))
+
+
 (with-primitive-procedures
   [flow/cohort-size]
   (defm form-and-prog
@@ -97,18 +107,32 @@
 
 
 (with-primitive-procedures
-  [flow/create-args-coll]
+  [flow/cohort-size]
+  (defm cohort-lifetime
+        "Simulating the lifetime of a cohort including formation and progression."
+        [t l-1 l-2 coll]
+        ((comp
+           #(progress (inc t) (cohort-size t %) %)
+           #(start-poisson-poisson t l-1 l-2 %))
+          coll)))
+
+
+(with-primitive-procedures
+  [flow/create-args-coll flow/cohort-size]
   (defquery
     two-stage-poisson-query
-    [args lifetime-fn]
+    [args]
 
     (let
       [compartments (create-args-coll (:t-max args) (:compartments args) (:inits args))
+       initialized-comps (init-compartments compartments)
+
        lambda-1 (sample (:prior-1 args))
        lambda-2 (sample (:prior-2 args))
 
-       f #(lifetime-fn %1 lambda-1 lambda-2 %2)
-       season (season-fn 0 compartments f)]
+       f #(cohort-lifetime %1 lambda-1 lambda-2 %2)
+
+       season (fw/season-fn 0 compartments f)]
 
 
       {:season season})))
