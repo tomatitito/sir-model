@@ -92,6 +92,6 @@
 
     (util.functions/write-seasons! samples getter-fns path header)))
 
-(time (-main 100000 10 1000))
+(time (-main 100000 10 10))
 
 

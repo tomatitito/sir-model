@@ -3,6 +3,26 @@
             [sir-model.dataflow :as flow])
   (:use [anglican emit runtime [core :exclude [-main]]]))
 
+
+
+(with-primitive-procedures
+  [flow/S->]
+  (defm infect
+        "Infections for time t. Infecting individuals from who infect new individuals as specified by how (must be a
+        function). Returns updated-coll."
+        [t who whom how coll]
+        (let
+          [max-cases (get-in coll [t :S])
+           old-cases (get-in coll [t who])
+
+           ;; there cannot be more new cases than susceptibles
+           new-cases (if (pos? old-cases)
+                       (min (how old-cases) max-cases)
+                       0)]
+          (S-> t whom new-cases coll))))
+
+
+
 (with-primitive-procedures
   [flow/cohort-size]
   (defm season-fn
