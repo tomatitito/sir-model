@@ -2,6 +2,13 @@
   (:require [clojure.java.io :as io]
             [clojure.data.csv :as csv]))
 
+(defn from-maps
+  "Extracts all vals for key(s) ks from a coll of maps. ks must be given as
+   a vector. Returns a vector."
+  [coll ks]
+  (reduce #(conj %1 (get-in %2 ks)) [] coll))
+
+
 (defn from-season
   "Extracts value for key from a single sample. key must be in a result from
   an anglican query."
