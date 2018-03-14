@@ -92,6 +92,81 @@
 
     (util.functions/write-seasons! samples getter-fns path header)))
 
+
+
+(defn season-spec
+  [samples kw]
+  {:data     {:values (util.functions/extract-for-vega samples kw)}
+   :mark     "tick"
+   :encoding {:x {:field "week"
+                  :type "nominal"
+                  }
+              :y {:field "data"
+                  :type  "quantitative"}}})
+
+
+(def new-cases-plot (season-spec one-samps :new))
+
+(def all-cases-plot (season-spec one-samps :I))
+
+(def weekly-dists-plot
+  {:data     {:values (util.functions/extract-for-vega one-samps :new)}
+   :encoding {:x {:field :data :type "quantitative"}
+              :y {:field :week :type "ordinal"}}
+   :mark     "tick"
+   })
+
+(defn weekly-data
+  [samples week]
+  (let
+    [seasons-by-week (util.functions/->vega-time-series (util.functions/from-results samples [:season]))
+     week-only (filter #(= week (get % :week)) seasons-by-week)]
+    week-only))
+
+
+(take 5 (weekly-data one-samps 6))
+(take 5 (util.functions/from-maps (weekly-data one-samps 5) [:data :S]))
+
+(defn week-plot-spec
+  [samples week]
+  {:data     {:values (util.functions/from-maps (weekly-data samples week) [:data :new])}
+   :mark     "bar"
+   :encoding {:x {:field "data" :type "quantitative"}
+              :y {:aggregate "count" :type "quantitative"}}})
+
+
+(def lambda-plot
+  {:data {:values (util.functions/from-results one-samps [:lambda])}
+   :mark "bar"
+   :encoding {:x {:bin true
+                  :field "data"
+                  :type "quantitative"}
+              :y {:aggregate "count"
+                  :type "quantitative"}}})
+
+
+(def lambda-prior-plot
+  {:data     {:values (repeatedly 1250 #(sample* (uniform-continuous 0.9 1.9)))}
+   :mark "bar"
+   :encoding {:x {:field "data" :type "quantitative" :bin true}
+              :y {:aggregate "count" :type "quantitative"}
+              :color {:value "green"}}})
+
+
+(def layered-histograms
+  {:layer
+   [lambda-plot, lambda-prior-plot
+    ]})
+
+(def col-histograms
+  {:hconcat [lambda-prior-plot lambda-plot]})
+
+(def dashboard
+  {:hconcat
+   [{:vconcat [new-cases-plot all-cases-plot col-histograms]}
+    weekly-dists-plot
+    (week-plot-spec one-samps 0)
+    ]})
 (time (-main 100000 10 10))
 
 

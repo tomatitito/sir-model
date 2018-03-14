@@ -91,3 +91,31 @@
       (when header
         (csv/write-csv writer header))
       (csv/write-csv writer (csv-data samples)))))
+
+
+(defn vec->vega-time-series
+  "Converts a vector of values. Returns a vector of maps, which have two key-value pairs,
+  one for :week and one for :data (cases). This format can be supplied as a values vector
+  for vega-lite."
+  [vec]
+  (letfn [(vec->series
+            [v]
+            (let [steps (range (count v))
+                  steps-and-vals (zipmap steps v)]
+              (for [[t v] steps-and-vals]
+                {:week t :data v}))
+            )
+          ]
+    (flatten
+      (map
+        #(vec->series %)
+        vec))))
+
+
+(defn extract-for-vega
+  "Extracts data for kw from seasons in an anglican sample and converts to a format for
+  plotting with vega-lite. Works only for single values, not e.g. for seasons."
+  [samples kw]
+  (->
+    (from-seasons samples kw)
+    (vec->vega-time-series)))
