@@ -107,14 +107,6 @@
 (take 5 (util/filter-by-week one-samps 6))
 (take 5 (util/from-maps (util/filter-by-week one-samps 5) [:data :S]))
 
-(defn week-plot-spec
-  [samples week]
-  {:data     {:values (util.functions/from-maps (util/filter-by-week samples week) [:data :new])}
-   :mark     "bar"
-   :encoding {:x {:field "data" :type "quantitative"}
-              :y {:aggregate "count" :type "quantitative"}}})
-
-
 (def lambda-plot
   {:data {:values (util.functions/from-results one-samps [:lambda])}
    :mark "bar"
@@ -145,7 +137,7 @@
   {:hconcat
    [{:vconcat [new-cases-plot all-cases-plot col-histograms]}
     weekly-dists-plot
-    (week-plot-spec one-samps 0)
+    (util/week-histo-spec one-samps 0)
     ]})
 (time (-main 100000 10 10))
 

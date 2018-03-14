@@ -149,3 +149,14 @@
     week-only))
 
 
+(defn week-histo-spec
+  "Returns a spec for vega-lite to plot a histogram of new infections for a specified week."
+  [samples week]
+  {:data     {:values (from-maps (filter-by-week samples week) [:data :new])}
+   :mark     "bar"
+   :encoding {:x {:field "data" :type "quantitative"}
+              :y {:aggregate "count" :type "quantitative"}}})
+
+
+
+
