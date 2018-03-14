@@ -97,12 +97,13 @@
 
 (def all-cases-plot (util/weekly-plot-spec one-samps :I))
 
-(def weekly-dists-plot
-  {:data     {:values (util/extract-for-vega one-samps :new)}
-   :encoding {:x {:field :data :type "quantitative"}
-              :y {:field :week :type "ordinal"}}
-   :mark     "tick"
-   })
+;(def weekly-dists-plot
+;  {:data     {:values (util/extract-for-vega one-samps :new)}
+;   :encoding {:x {:field :data :type "quantitative"}
+;              :y {:field :week :type "ordinal"}}
+;   :mark     "tick"
+;   }
+;  )
 
 (take 5 (util/filter-by-week one-samps 6))
 (take 5 (util/from-maps (util/filter-by-week one-samps 5) [:data :S]))

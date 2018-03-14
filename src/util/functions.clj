@@ -158,5 +158,12 @@
               :y {:aggregate "count" :type "quantitative"}}})
 
 
-
+(defn weekly-dists-spec
+  "Returns a vega-lite spec for vertically plotting the weekly dists for kw."
+  [samples kw]
+  {:data     {:values (extract-for-vega samples kw)}
+   :encoding {:x {:field :data :type "quantitative"}
+              :y {:field :week :type "ordinal"}}
+   :mark     "tick"
+   })
 
