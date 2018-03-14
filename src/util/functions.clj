@@ -167,3 +167,15 @@
    :mark     "tick"
    })
 
+
+(defn histo-spec
+  "Returns a vega-lite spec for plotting a histogram for seq of vals."
+  [vals]
+  {:data {:values vals}
+   :mark "bar"
+   :encoding {:x {:bin true
+                  :field "data"
+                  :type "quantitative"}
+              :y {:aggregate "count"
+                  :type "quantitative"}}})
+
