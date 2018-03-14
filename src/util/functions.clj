@@ -138,3 +138,14 @@
                   }
               :y {:field "data"
                   :type  "quantitative"}}})
+
+
+(defn get-weeks-from-samples
+  "Takes anglican samples and returns only those for specified week."
+  [samples week]
+  (let
+    [seasons-by-week (util/->vega-time-series (util/from-results samples [:season]))
+     week-only (filter #(= week (get % :week)) seasons-by-week)]
+    week-only))
+
+

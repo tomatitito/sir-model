@@ -98,26 +98,18 @@
 (def all-cases-plot (util/weekly-plot-spec one-samps :I))
 
 (def weekly-dists-plot
-  {:data     {:values (util.functions/extract-for-vega one-samps :new)}
+  {:data     {:values (util/extract-for-vega one-samps :new)}
    :encoding {:x {:field :data :type "quantitative"}
               :y {:field :week :type "ordinal"}}
    :mark     "tick"
    })
 
-(defn weekly-data
-  [samples week]
-  (let
-    [seasons-by-week (util.functions/->vega-time-series (util.functions/from-results samples [:season]))
-     week-only (filter #(= week (get % :week)) seasons-by-week)]
-    week-only))
-
-
-(take 5 (weekly-data one-samps 6))
-(take 5 (util.functions/from-maps (weekly-data one-samps 5) [:data :S]))
+(take 5 (util/get-weeks-from-samples one-samps 6))
+(take 5 (util/from-maps (util/get-weeks-from-samples one-samps 5) [:data :S]))
 
 (defn week-plot-spec
   [samples week]
-  {:data     {:values (util.functions/from-maps (weekly-data samples week) [:data :new])}
+  {:data     {:values (util.functions/from-maps (util/get-weeks-from-samples samples week) [:data :new])}
    :mark     "bar"
    :encoding {:x {:field "data" :type "quantitative"}
               :y {:aggregate "count" :type "quantitative"}}})
