@@ -131,7 +131,7 @@
 (defn weekly-plot-spec
   "Return a spec for vega-lite to plot data for kw in samples by week."
   [samples kw]
-  {:data     {:values (util.functions/extract-for-vega samples kw)}
+  {:data     {:values (extract-for-vega samples kw)}
    :mark     "tick"
    :encoding {:x {:field "week"
                   :type "nominal"
@@ -144,7 +144,7 @@
   "Takes anglican samples and returns only those for specified week."
   [samples week]
   (let
-    [seasons-by-week (util/->vega-time-series (util/from-results samples [:season]))
+    [seasons-by-week (->vega-time-series (from-results samples [:season]))
      week-only (filter #(= week (get % :week)) seasons-by-week)]
     week-only))
 
