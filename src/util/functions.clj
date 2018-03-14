@@ -140,7 +140,7 @@
                   :type  "quantitative"}}})
 
 
-(defn get-weeks-from-samples
+(defn filter-by-week
   "Takes anglican samples and returns only those for specified week."
   [samples week]
   (let

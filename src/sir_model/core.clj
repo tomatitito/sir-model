@@ -104,12 +104,12 @@
    :mark     "tick"
    })
 
-(take 5 (util/get-weeks-from-samples one-samps 6))
-(take 5 (util/from-maps (util/get-weeks-from-samples one-samps 5) [:data :S]))
+(take 5 (util/filter-by-week one-samps 6))
+(take 5 (util/from-maps (util/filter-by-week one-samps 5) [:data :S]))
 
 (defn week-plot-spec
   [samples week]
-  {:data     {:values (util.functions/from-maps (util/get-weeks-from-samples samples week) [:data :new])}
+  {:data     {:values (util.functions/from-maps (util/filter-by-week samples week) [:data :new])}
    :mark     "bar"
    :encoding {:x {:field "data" :type "quantitative"}
               :y {:aggregate "count" :type "quantitative"}}})
