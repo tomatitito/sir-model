@@ -93,21 +93,9 @@
     (util.functions/write-seasons! samples getter-fns path header)))
 
 
+(def new-cases-plot (util/weekly-plot-spec one-samps :new))
 
-(defn season-spec
-  [samples kw]
-  {:data     {:values (util.functions/extract-for-vega samples kw)}
-   :mark     "tick"
-   :encoding {:x {:field "week"
-                  :type "nominal"
-                  }
-              :y {:field "data"
-                  :type  "quantitative"}}})
-
-
-(def new-cases-plot (season-spec one-samps :new))
-
-(def all-cases-plot (season-spec one-samps :I))
+(def all-cases-plot (util/weekly-plot-spec one-samps :I))
 
 (def weekly-dists-plot
   {:data     {:values (util.functions/extract-for-vega one-samps :new)}

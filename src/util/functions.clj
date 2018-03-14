@@ -119,3 +119,15 @@
   (->
     (from-seasons samples kw)
     (vec->vega-time-series)))
+
+
+(defn weekly-plot-spec
+  "Return a spec for vega-lite to plot data for kw in samples by week."
+  [samples kw]
+  {:data     {:values (util.functions/extract-for-vega samples kw)}
+   :mark     "tick"
+   :encoding {:x {:field "week"
+                  :type "nominal"
+                  }
+              :y {:field "data"
+                  :type  "quantitative"}}})
