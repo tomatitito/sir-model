@@ -8,9 +8,9 @@
                  [org.clojure/data.csv "0.1.3"]
                  [org.clojure/tools.namespace "0.2.11"]
                  [anglican "1.0.0"]
-                 [com.climate/claypoole "1.1.4"]
-                 [lein-gorilla "0.4.0"]]
+                 [com.climate/claypoole "1.1.4"]]
   :main sir-model.core
   :aot [sir-model.core]
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
+
