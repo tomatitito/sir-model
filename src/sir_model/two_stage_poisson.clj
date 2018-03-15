@@ -5,6 +5,20 @@
   (:use [anglican [core :exclude [-main]] runtime emit]))
 
 
+
+(defdist new-cases-dist
+         [N lambda]
+         [*lambda (* N lambda)]
+         (sample* [this]
+                  (if (> *lambda 30)
+                    (sample* (d/fast-poisson *lambda))
+                    (sample* (poisson *lambda))))
+         (observe* [this value]
+                   (if (pos? N)
+                     (observe* (poisson *lambda) value)
+                     0)))
+
+
 (with-primitive-procedures
   [d/fast-poisson]
   (defm generate-poisson
