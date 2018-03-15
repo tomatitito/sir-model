@@ -4,7 +4,8 @@
             [clojure.data.csv :as csv]
             [util.functions :as util]
             [sir-model.two-stage-poisson :as model]
-            [com.climate.claypoole :as cp])
+            [com.climate.claypoole :as cp]
+            [oz.core :as oz])
   (:use [anglican [core :exclude [-main]] runtime emit stat]))
 
 
@@ -79,7 +80,7 @@
     [args (assoc arg-map :inits {:S population :I initially-infected})
      thin-par (if thin (first thin) 1)
      samples (sampler model/two-stage-poisson-query args n-runs thin-par)
-     getter-fns [util.functions/new-infections
+     getter-fns [util.functions/new-infections-in-season
            #(util.functions/from-season % :S)
            #(util.functions/from-season % :I)
            #(util.functions/from-season % :R)
@@ -92,10 +93,43 @@
 
     (util.functions/write-seasons! samples getter-fns path header)))
 
+;(def samples (sampler model/two-stage-poisson-query arg-map 100 1))
+;(first samples)
+;(util/vec->vega-time-series (first (util/new-infections-in-seasons samples)))
 
-(def new-cases-plot (util/weekly-plot-spec one-samps :new))
+(def new
+  (util/vec->vega-time-series (util/new-infections-in-seasons samples)))
 
-(def all-cases-plot (util/weekly-plot-spec one-samps :I))
+
+(def new-cases-plot (util/weekly-plot-spec samples :new))
+
+(defn dashboard
+  [samples]
+  (let
+    [primary (util/weekly-plot-spec samples :primary)
+     secondary (util/weekly-plot-spec samples :secondary)
+     new {:data     {:values (util/vec->vega-time-series (util/new-infections-in-seasons samples))}
+          :mark     "tick"
+          :encoding {:x {:field :week :type "ordinal"}
+                     :y {:field :data :type "quantitative"}}}
+     lambda-1 (util/histo-spec (util/from-results samples :lambda-1))
+     lambda-2 (util/histo-spec (util/from-results samples :lambda-2))
+     weekly-dists {:data     {:values (util/vec->vega-time-series (util/new-infections-in-seasons samples))}
+                   :mark     "tick"
+                   :encoding {:x {:field :data :type "quantitative"}
+                              :y {:field :week :type "ordinal"}}}
+
+     board {:hconcat
+            [{:vconcat [primary secondary new {:hconcat [lambda-1 lambda-2]}]}
+             weekly-dists]}
+     ]
+
+    (oz/v! board)))
+
+(dashboard samples)
+
+
+;(def all-cases-plot (util/weekly-plot-spec one-samps :I))
 
 ;(def weekly-dists-plot
 ;  {:data     {:values (util/extract-for-vega one-samps :new)}
@@ -105,41 +139,43 @@
 ;   }
 ;  )
 
-(take 5 (util/filter-by-week one-samps 6))
-(take 5 (util/from-maps (util/filter-by-week one-samps 5) [:data :S]))
+;(take 5 (util/filter-by-week one-samps 6))
+;(take 5 (util/from-maps (util/filter-by-week one-samps 5) [:data :S]))
 
-(def lambda-plot
-  {:data {:values (util.functions/from-results one-samps [:lambda])}
-   :mark "bar"
-   :encoding {:x {:bin true
-                  :field "data"
-                  :type "quantitative"}
-              :y {:aggregate "count"
-                  :type "quantitative"}}})
-
-
-(def lambda-prior-plot
-  {:data     {:values (repeatedly 1250 #(sample* (uniform-continuous 0.9 1.9)))}
-   :mark "bar"
-   :encoding {:x {:field "data" :type "quantitative" :bin true}
-              :y {:aggregate "count" :type "quantitative"}
-              :color {:value "green"}}})
-
-
-(def layered-histograms
-  {:layer
-   [lambda-plot, lambda-prior-plot
-    ]})
-
-(def col-histograms
-  {:hconcat [lambda-prior-plot lambda-plot]})
-
-(def dashboard
-  {:hconcat
-   [{:vconcat [new-cases-plot all-cases-plot col-histograms]}
-    weekly-dists-plot
-    (util/week-histo-spec one-samps 0)
-    ]})
-(time (-main 100000 10 10))
+;(def lambda-plot
+;  {:data {:values (util.functions/from-results one-samps [:lambda])}
+;   :mark "bar"
+;   :encoding {:x {:bin true
+;                  :field "data"
+;                  :type "quantitative"}
+;              :y {:aggregate "count"
+;                  :type "quantitative"}}}
+;  )
+;(def lambda-plot (util/histo-spec (util/from-results one-samps [:lambda])))
+;
+;
+;(def lambda-prior-plot
+;  {:data     {:values (repeatedly 1250 #(sample* (uniform-continuous 0.9 1.9)))}
+;   :mark "bar"
+;   :encoding {:x {:field "data" :type "quantitative" :bin true}
+;              :y {:aggregate "count" :type "quantitative"}
+;              :color {:value "green"}}})
+;
+;
+;(def layered-histograms
+;  {:layer
+;   [lambda-plot, lambda-prior-plot
+;    ]})
+;
+;(def col-histograms
+;  {:hconcat [lambda-prior-plot lambda-plot]})
+;
+;(def dashboard
+;  {:hconcat
+;   [{:vconcat [new-cases-plot all-cases-plot col-histograms]}
+;    weekly-dists-plot
+;    (util/week-histo-spec one-samps 0)
+;    ]})
+;(time (-main 100000 10 10))
 
 

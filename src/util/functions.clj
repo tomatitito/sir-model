@@ -19,6 +19,15 @@
     (get-in sample [:result :season])))
 
 
+(defn from-seasons
+  "Extracts value for key from seasons. See from-season."
+  [samples key]
+  (reduce
+    #(conj %1 (from-season %2 key))
+    []
+    samples))
+
+
 (defn from-result
   "Extracts value for key from a single sample. key must be in a result from
   an anglican query. keys must be given in vector:
@@ -42,11 +51,30 @@
   (from-season sample :I))
 
 
-(defn new-infections
+(defn new-infections-in-season
   [sample]
   (let [primary (from-season sample :primary)
         secondary (from-season sample :secondary)]
     (map #(+ %1 %2) primary secondary)))
+
+
+(defn new-infections-in-seasons
+  [samples]
+  (reduce #(conj %1 (new-infections-in-season %2)) [] samples))
+
+
+(defn sum-compartments
+  "Sum specified compartments of an sir-record. Compartments have to be given as coll.
+  Used to check, if e.g. the [:I :R] compartments sum to the same number over the course
+  of a progression, as they should."
+  ([sir-record comps]
+   (sum-compartments sir-record 0 comps))
+  ([sir-record acc comps]
+   (loop [[head & tail] comps
+          sum acc]
+     (if (not (seq tail))
+       (+ sum (get sir-record head))
+       (recur tail (+ sum (get sir-record head)))))))
 
 
 (defmulti #^{:private true} data-for-single-season (fn [query-result f sim-id] (sequential? f)))
@@ -144,7 +172,7 @@
   "Takes anglican samples and returns only those for specified week."
   [samples week]
   (let
-    [seasons-by-week (->vega-time-series (from-results samples [:season]))
+    [seasons-by-week (vec->vega-time-series (from-results samples [:season]))
      week-only (filter #(= week (get % :week)) seasons-by-week)]
     week-only))
 

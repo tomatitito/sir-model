@@ -117,5 +117,5 @@
        season (fw/season-fn 0 compartments f)]
 
 
-      {:season season})))
+      {:lambda-1 lambda-1 :lambda-2 lambda-2 :season season})))
 
