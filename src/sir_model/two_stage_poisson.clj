@@ -79,13 +79,34 @@
 
 (with-primitive-procedures
   [flow/cohort-size]
-  (defm cohort-lifetime
+  (defm start-and-progress
         "Simulating the lifetime of a cohort including formation and progression."
         [t l-1 l-2 coll]
         ((comp
            #(progress (inc t) (cohort-size t %) %)
            #(start-poisson-poisson t l-1 l-2 %))
           coll)))
+
+
+(defm split-observed
+      "Split number of observed cases according to ratio of primary and secondary cases. Returns
+      a vector with numbers for estimated primary and secondary observed cases."
+      [t cases l-1 l-2 coll]
+      (let
+        [n-primary (get-in coll [t :primary])
+         n-secondary (get-in coll [t :secondary])
+         ratio-for-secondary (/
+                               (* l-2 n-secondary)
+                               (+ (* l-2 n-secondary) (* l-1 n-primary)))
+         obs-secondary (* ratio-for-secondary cases)
+         obs-primary (- cases obs-secondary)]
+        [obs-primary obs-secondary]))
+
+
+;(defm observe-poisson-poisson
+;      [prim-and-sec]
+;      (let [[prime sec] prim-and-sec]
+;        (observe ())))
 
 
 (with-primitive-procedures
@@ -101,10 +122,11 @@
        lambda-1 (sample (:prior-1 args))
        lambda-2 (sample (:prior-2 args))
 
-       f #(cohort-lifetime %1 lambda-1 lambda-2 %2)
+       f #(start-and-progress %1 lambda-1 lambda-2 %2)
 
        season (fw/season-fn 0 compartments f)]
 
 
       {:lambda-1 lambda-1 :lambda-2 lambda-2 :season season})))
+
 
