@@ -129,53 +129,6 @@
 (dashboard samples)
 
 
-;(def all-cases-plot (util/weekly-plot-spec one-samps :I))
-
-;(def weekly-dists-plot
-;  {:data     {:values (util/extract-for-vega one-samps :new)}
-;   :encoding {:x {:field :data :type "quantitative"}
-;              :y {:field :week :type "ordinal"}}
-;   :mark     "tick"
-;   }
-;  )
-
-;(take 5 (util/filter-by-week one-samps 6))
-;(take 5 (util/from-maps (util/filter-by-week one-samps 5) [:data :S]))
-
-;(def lambda-plot
-;  {:data {:values (util.functions/from-results one-samps [:lambda])}
-;   :mark "bar"
-;   :encoding {:x {:bin true
-;                  :field "data"
-;                  :type "quantitative"}
-;              :y {:aggregate "count"
-;                  :type "quantitative"}}}
-;  )
-;(def lambda-plot (util/histo-spec (util/from-results one-samps [:lambda])))
-;
-;
-;(def lambda-prior-plot
-;  {:data     {:values (repeatedly 1250 #(sample* (uniform-continuous 0.9 1.9)))}
-;   :mark "bar"
-;   :encoding {:x {:field "data" :type "quantitative" :bin true}
-;              :y {:aggregate "count" :type "quantitative"}
-;              :color {:value "green"}}})
-;
-;
-;(def layered-histograms
-;  {:layer
-;   [lambda-plot, lambda-prior-plot
-;    ]})
-;
-;(def col-histograms
-;  {:hconcat [lambda-prior-plot lambda-plot]})
-;
-;(def dashboard
-;  {:hconcat
-;   [{:vconcat [new-cases-plot all-cases-plot col-histograms]}
-;    weekly-dists-plot
-;    (util/week-histo-spec one-samps 0)
-;    ]})
 ;(time (-main 100000 10 10))
 
 
