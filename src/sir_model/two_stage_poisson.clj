@@ -89,19 +89,31 @@
 
 
 (defm split-observed
-      "Split number of observed cases according to ratio of primary and secondary cases. Returns
-      a vector with numbers for estimated primary and secondary observed cases."
+      "Split number of observed cases according to ratio of primary and secondary cases
+      combined with parameters l-1 and l-2. Returns a vector with numbers for estimated
+      primary and secondary observed cases."
       [t l-1 l-2 coll args]
       (let
         [n-total (get (:data args) t)
          n-primary (get-in coll [t :primary])
-         n-secondary (get-in coll [t :secondary])
-         ratio-for-secondary (/
-                               (* l-2 n-secondary)
-                               (+ (* l-2 n-secondary) (* l-1 n-primary)))
-         obs-secondary (* ratio-for-secondary n-total)
-         obs-primary (- n-total obs-secondary)]
-        [obs-primary obs-secondary]))
+         n-secondary (get-in coll [t :secondary])]
+
+        (cond
+          ;; if there are no primary infections, all new cases are
+          ;; caused by secondary infections and vice versa
+          (zero? n-primary) [0 n-total]
+          (zero? n-secondary) [n-total 0]
+          ;; if there are no infectious people at all but there is data,
+          ;; split the data according to ratio of params
+          (and (zero? n-primary) (zero? n-secondary)) [(* l-1 n-total) (* l-2 n-total)]
+          :else (let
+                  [ratio (/
+                           (* l-2 n-secondary)
+                           (+ (* l-2 n-secondary) (* l-1 n-primary)))
+                   obs-2 (* ratio n-total)
+                   obs-1 (- n-total obs-2)]
+                  [obs-1 obs-2])
+          )))
 
 
 (defm cohort-lifetime
@@ -117,8 +129,8 @@
              ;; estimating the proportion of new primary and secondary cases
              [cases-primary cases-secondary] (split-observed t l-1 l-2 coll args)]
 
-            (observe (poisson (* l-1 n-primary) cases-primary))
-            (observe (poisson (* l-2 n-secondary) cases-secondary))))
+            (observe (poisson (* l-1 n-primary)) cases-primary)
+            (observe (poisson (* l-2 n-secondary)) cases-secondary)))
         updated-coll))
 
 
