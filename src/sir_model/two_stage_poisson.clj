@@ -91,22 +91,35 @@
 (defm split-observed
       "Split number of observed cases according to ratio of primary and secondary cases. Returns
       a vector with numbers for estimated primary and secondary observed cases."
-      [t cases l-1 l-2 coll]
+      [t l-1 l-2 coll args]
       (let
-        [n-primary (get-in coll [t :primary])
+        [n-total (get (:data args) t)
+         n-primary (get-in coll [t :primary])
          n-secondary (get-in coll [t :secondary])
          ratio-for-secondary (/
                                (* l-2 n-secondary)
                                (+ (* l-2 n-secondary) (* l-1 n-primary)))
-         obs-secondary (* ratio-for-secondary cases)
-         obs-primary (- cases obs-secondary)]
+         obs-secondary (* ratio-for-secondary n-total)
+         obs-primary (- n-total obs-secondary)]
         [obs-primary obs-secondary]))
 
 
-;(defm observe-poisson-poisson
-;      [prim-and-sec]
-;      (let [[prime sec] prim-and-sec]
-;        (observe ())))
+(defm cohort-lifetime
+      [t l-1 l-2 coll args]
+      (let
+        [updated-coll (start-and-progress t l-1 l-2 coll)]
+
+        (when (and
+                (:data args) (< t (count (:data args))))
+          (let
+            [n-primary (get-in coll [t :primary])
+             n-secondary (get-in coll [t :secondary])
+             ;; estimating the proportion of new primary and secondary cases
+             [cases-primary cases-secondary] (split-observed t l-1 l-2 coll args)]
+
+            (observe (poisson (* l-1 n-primary) cases-primary))
+            (observe (poisson (* l-2 n-secondary) cases-secondary))))
+        updated-coll))
 
 
 (with-primitive-procedures
@@ -122,7 +135,9 @@
        lambda-1 (sample (:prior-1 args))
        lambda-2 (sample (:prior-2 args))
 
-       f #(start-and-progress %1 lambda-1 lambda-2 %2)
+       ;f #(start-and-progress %1 lambda-1 lambda-2 %2)
+       f #(cohort-lifetime %1 lambda-1 lambda-2 %2 args)
+       ;dance (cohort-lifetime 0 lambda-1 lambda-2 initialized-comps args)
 
        season (fw/season-fn 0 compartments f)]
 

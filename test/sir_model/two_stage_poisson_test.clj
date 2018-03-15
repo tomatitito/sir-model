@@ -52,7 +52,7 @@
 
        ;; lifetime-fn for simulation
        f #(lifetime-fn %1 r-1 r-2 %2)
-       season (model/season-fn 0 compartments f)]
+       season (fw/season-fn 0 compartments f)]
 
       {:initial-only initial-only :season season})))
 
