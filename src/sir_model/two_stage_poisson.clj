@@ -79,17 +79,6 @@
 
 (with-primitive-procedures
   [flow/cohort-size]
-  (defm form-and-prog
-        "Formation and Progression of a cohort."
-        [t l-1 l-2 coll]
-        ((comp
-           #(progress (inc t) (cohort-size t %) %)
-           #(start-poisson-poisson t l-1 l-2 %))
-          coll)))
-
-
-(with-primitive-procedures
-  [flow/cohort-size]
   (defm cohort-lifetime
         "Simulating the lifetime of a cohort including formation and progression."
         [t l-1 l-2 coll]
