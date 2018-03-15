@@ -20,15 +20,12 @@
 
 
 (with-primitive-procedures
-  [d/fast-poisson]
+  [new-cases-dist]
   (defm generate-poisson
         [N lambda]
         "Draws a sample from the distribution of new infections given parameter lambda and number of already
         infected individuals."
-        (let [lambda* (* N lambda)]
-          (if (> lambda* 30)
-            (sample (fast-poisson lambda*))
-            (sample (poisson lambda*))))))
+        (sample (new-cases-dist N lambda))))
 
 
 (defm primary-poisson
@@ -126,26 +123,28 @@
                            (+ (* l-2 n-secondary) (* l-1 n-primary)))
                    obs-2 (* ratio n-total)
                    obs-1 (- n-total obs-2)]
-                  [obs-1 obs-2])
-          )))
+                  [obs-1 obs-2]))))
 
 
-(defm cohort-lifetime
-      [t l-1 l-2 coll args]
-      (let
-        [updated-coll (start-and-progress t l-1 l-2 coll)]
+(with-primitive-procedures
+  [new-cases-dist]
+  (defm cohort-lifetime
+        [t l-1 l-2 coll args]
+        (let
+          [updated-coll (start-and-progress t l-1 l-2 coll)]
 
-        (when (and
-                (:data args) (< t (count (:data args))))
-          (let
-            [n-primary (get-in coll [t :primary])
-             n-secondary (get-in coll [t :secondary])
-             ;; estimating the proportion of new primary and secondary cases
-             [cases-primary cases-secondary] (split-observed t l-1 l-2 coll args)]
+          (when (and
+                  (:data args) (< t (count (:data args))))
+            (let
+              [n-primary (get-in coll [t :primary])
+               n-secondary (get-in coll [t :secondary])
+               ;; estimating the proportion of new primary and secondary cases
+               [cases-primary cases-secondary] (split-observed t l-1 l-2 coll args)]
 
-            (observe (poisson (* l-1 n-primary)) cases-primary)
-            (observe (poisson (* l-2 n-secondary)) cases-secondary)))
-        updated-coll))
+              (observe (new-cases-dist n-primary l-1) cases-primary)
+              (observe (new-cases-dist n-secondary l-2) cases-secondary)
+              ))
+          updated-coll)))
 
 
 (with-primitive-procedures
@@ -163,7 +162,6 @@
 
        ;f #(start-and-progress %1 lambda-1 lambda-2 %2)
        f #(cohort-lifetime %1 lambda-1 lambda-2 %2 args)
-       ;dance (cohort-lifetime 0 lambda-1 lambda-2 initialized-comps args)
 
        season (fw/season-fn 0 compartments f)]
 

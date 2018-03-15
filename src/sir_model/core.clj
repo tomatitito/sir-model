@@ -17,6 +17,7 @@
    :prior-2      (uniform-continuous 1.5 2.5)
    :n-samples    10
    :n-thin        1
+   :data         [5 20 100 120 200 100 300 700 1000 1400 1700 1600 1500 100 600 300 200 100 50 20 10 5 4]
    })
 
 
@@ -93,8 +94,8 @@
 
     (util.functions/write-seasons! samples getter-fns path header)))
 
-;(def samples (sampler model/two-stage-poisson-query arg-map 100 1))
-;(first samples)
+(def samples (sampler model/two-stage-poisson-query arg-map 10 1))
+(first samples)
 ;(util/vec->vega-time-series (first (util/new-infections-in-seasons samples)))
 
 (def new
