@@ -42,14 +42,31 @@
       (fw/infect t :primary :secondary #(generate-poisson % lambda) coll))
 
 
-(defm start-poisson-poisson
-      "Starts a cohort in two phases. First phase uses primary-poisson, second phase uses secondary-poisson. Is really
-      just a convenience wrapper around those functions."
-      [t l-1 l-2 coll]
-      ((comp
-         #(secondary-poisson t l-2 %)
-         #(primary-poisson t l-1 %))
-        coll))
+(with-primitive-procedures
+  [flow/a->b]
+  (defm remove-vaccinated
+        "Because some people are vaccinated, they will not get sick after encountering a sick person. To account
+        for this, some of those that have been infected are now removed from the primary and secondary compartemnts
+        and are put back into the S compartment."
+        [t vac-rate coll]
+        (let
+          [rem-pri (sample (binomial (get-in coll [t :primary]) vac-rate))
+           rem-sec (sample (binomial (get-in coll [t :secondary]) vac-rate))]
+
+          (a->b [t :primary] [t :S] rem-pri
+                     (a->b [t :secondary] [t :S] rem-sec coll))
+          )))
+
+(with-primitive-procedures [flow/a->b]
+                           (defm start-poisson-poisson
+                                 "Starts a cohort in two phases. First phase uses primary-poisson, second phase uses secondary-poisson. Is really
+                                 just a convenience wrapper around those functions."
+                                 [t l-1 l-2 coll]
+                                 ((comp
+                                    #(remove-vaccinated t 0.2 %)
+                                    #(secondary-poisson t l-2 %)
+                                    #(primary-poisson t l-1 %))
+                                   coll)))
 
 
 (with-primitive-procedures
