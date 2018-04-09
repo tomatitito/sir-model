@@ -10,11 +10,11 @@
 
 
 (def arg-map
-  {:t-max        40
+  {:t-max        30
    :compartments [:S :I :R :primary :secondary]
-   :inits        {:S 1000000 :I 400}
+   :inits        {:S 1000000 :I 2800}
    :prior-1      (uniform-continuous 0.4 0.9)
-   :prior-2      (uniform-continuous 1.5 2.5)
+   :prior-2      (uniform-continuous 1.0 2.0)
    :n-samples    10
    :n-thin        1
    :data         [5 20 100 120 200 100 300 700 1000 1400 1700 1600 1500 100 600 300 200 100 50 20 10 5 4]
@@ -94,7 +94,7 @@
 
     (util.functions/write-seasons! samples getter-fns path header)))
 
-(def samples (sampler model/two-stage-poisson-query arg-map 10 1))
+(def samples (sampler model/two-stage-poisson-query arg-map 1000 1))
 (first samples)
 ;(util/vec->vega-time-series (first (util/new-infections-in-seasons samples)))
 
