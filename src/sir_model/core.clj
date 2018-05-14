@@ -82,7 +82,7 @@
     (oz/v! board)))
 
 
-(let [n-runs 100
+(let [n-runs 5000
       samples (sampler model/two-stage-poisson-query arg-map n-runs)]
   (dashboard samples))
 
