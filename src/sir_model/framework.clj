@@ -1,5 +1,5 @@
 (ns sir-model.framework
-  (:require [util.functions :as u]
+  (:require [sir-model.util :as u]
             [sir-model.dataflow :as flow])
   (:use [anglican emit runtime [core :exclude [-main]]]))
 

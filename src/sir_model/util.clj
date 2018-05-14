@@ -1,4 +1,4 @@
-(ns util.functions
+(ns sir-model.util
   (:require [clojure.java.io :as io]
             [clojure.data.csv :as csv]))
 

@@ -2,7 +2,8 @@
   (:gen-class)
   (:require [clojure.java.io :as io]
             [clojure.data.csv :as csv]
-            [util.functions :as util]
+            ;[util.functions :as util]
+            [sir-model.util :as util]
             [sir-model.two-stage-poisson :as model]
             [com.climate.claypoole :as cp]
             [oz.core :as oz])
@@ -12,9 +13,9 @@
 (def arg-map
   {:t-max        30
    :compartments [:S :I :R :primary :secondary]
-   :inits        {:S 1000000 :I 2800}
+   :inits        {:S 100000 :I 2}
    :prior-1      (uniform-continuous 0.4 0.9)
-   :prior-2      (uniform-continuous 1.0 2.0)
+   :prior-2      (uniform-continuous 0.8 1.2)
    :n-samples    10
    :n-thin        1
    :data         [5 20 100 120 200 100 300 700 1000 1400 1700 1600 1500 100 600 300 200 100 50 20 10 5 4]
@@ -81,20 +82,20 @@
     [args (assoc arg-map :inits {:S population :I initially-infected})
      thin-par (if thin (first thin) 1)
      samples (sampler model/two-stage-poisson-query args n-runs thin-par)
-     getter-fns [util.functions/new-infections-in-season
-           #(util.functions/from-season % :S)
-           #(util.functions/from-season % :I)
-           #(util.functions/from-season % :R)
-           #(util.functions/from-season % :primary)
-           #(util.functions/from-season % :secondary)]
+     getter-fns [util/new-infections-in-season
+           #(util/from-season % :S)
+           #(util/from-season % :I)
+           #(util/from-season % :R)
+           #(util/from-season % :primary)
+           #(util/from-season % :secondary)]
      filename (clojure.string/join "_" (conj (compute-filename args) n-runs))
      filedir "data"
      path (str filedir "/" filename ".csv")
      header ["week" "new" "S" "I" "R" "primary" "secondary" "sim_id"]]
 
-    (util.functions/write-seasons! samples getter-fns path header)))
+    (util/write-seasons! samples getter-fns path header)))
 
-(def samples (sampler model/two-stage-poisson-query arg-map 1000 1))
+(def samples (sampler model/two-stage-poisson-query arg-map 5000 1))
 (first samples)
 ;(util/vec->vega-time-series (first (util/new-infections-in-seasons samples)))
 
@@ -127,6 +128,7 @@
 
     (oz/v! board)))
 
+(oz/start-plot-server!)
 (dashboard samples)
 
 
