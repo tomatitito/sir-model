@@ -28,6 +28,7 @@
 
 
 (defn force-sample
+  "Evaluates a lazy-sample and increments counter."
   [query-results n]
   (send counter inc)
   (nth query-results n))
@@ -57,51 +58,6 @@
       (pmap-samples n)))
 
 
-(defmacro query-string
-  [anglican-query]
-  `(let
-     [macro-model# (:name (meta (var ~anglican-query)))]
-     (str macro-model#)))
-
-
-(defn compute-filename [args]
-  [(.toString (java.time.LocalDateTime/now))
-   "two-stage-poisson-query"
-   (get-in args [:inits :S])
-   (get-in args [:inits :I])])
-
-
-(defn -main
-  "Probabilistic SIR-Model"
-  [population initially-infected n-runs & thin]
-
-  (let
-    [args (assoc arg-map :inits {:S population :I initially-infected})
-     thin-par (if thin (first thin) 1)
-     samples (sampler model/two-stage-poisson-query args n-runs thin-par)
-     getter-fns [util/new-infections-in-season
-           #(util/from-season % :S)
-           #(util/from-season % :I)
-           #(util/from-season % :R)
-           #(util/from-season % :primary)
-           #(util/from-season % :secondary)]
-     filename (clojure.string/join "_" (conj (compute-filename args) n-runs))
-     filedir "data"
-     path (str filedir "/" filename ".csv")
-     header ["week" "new" "S" "I" "R" "primary" "secondary" "sim_id"]]
-
-    (util/write-seasons! samples getter-fns path header)))
-
-(def samples (sampler model/two-stage-poisson-query arg-map 5000))
-(first samples)
-;(util/vec->vega-time-series (first (util/new-infections-in-seasons samples)))
-;
-(def new
-  (util/vec->vega-time-series (util/new-infections-in-seasons samples)))
-
-
-(def new-cases-plot (util/weekly-plot-spec samples :new))
-
 (defn dashboard
   [samples]
   (let
@@ -125,10 +81,9 @@
 
     (oz/v! board)))
 
-(oz/start-plot-server!)
-(dashboard samples)
 
-
-;(time (-main 100000 10 10))
+(let [n-runs 100
+      samples (sampler model/two-stage-poisson-query arg-map n-runs)]
+  (dashboard samples))
 
 
