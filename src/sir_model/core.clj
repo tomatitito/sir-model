@@ -2,7 +2,6 @@
   (:gen-class)
   (:require [clojure.java.io :as io]
             [clojure.data.csv :as csv]
-            ;[util.functions :as util]
             [sir-model.util :as util]
             [sir-model.two-stage-poisson :as model]
             [com.climate.claypoole :as cp]
