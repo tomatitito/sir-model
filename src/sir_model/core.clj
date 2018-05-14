@@ -42,21 +42,19 @@
 (defn pmap-samples
   "Takes the result from an anglican doquery and an optional thinning parameter
   and extracts n elements out of that lazy-seq."
-  ([query-results n]
-   (pmap-samples query-results n 1))
-  ([query-results n thin]
-   (let [n-cpus (.. Runtime getRuntime availableProcessors)
-         n-threads (+ n-cpus 2)]
-     ;; if no logging to screen is needed, use the commented version
-     ;(pmap #(nth query-result %) (range 0 n thin))
-     (cp/upmap n-threads #(force-sample query-results %) (range 0 n thin)))))
+  [query-results n]
+  (let [n-cpus (.. Runtime getRuntime availableProcessors)
+        n-threads (+ n-cpus 2)]
+    ;; if no logging to screen is needed, use the commented version
+    ;(pmap #(nth query-result %) (range 0 n thin))
+    (cp/upmap n-threads #(force-sample query-results %) (range 0 n))))
 
 
 (defn sampler
-  [anglican-query args n thin]
+  [anglican-query args n]
   (-> anglican-query
       (lazy-samples args)
-      (pmap-samples n thin)))
+      (pmap-samples n)))
 
 
 (defmacro query-string
@@ -94,10 +92,10 @@
 
     (util/write-seasons! samples getter-fns path header)))
 
-(def samples (sampler model/two-stage-poisson-query arg-map 5000 1))
+(def samples (sampler model/two-stage-poisson-query arg-map 5000))
 (first samples)
 ;(util/vec->vega-time-series (first (util/new-infections-in-seasons samples)))
-
+;
 (def new
   (util/vec->vega-time-series (util/new-infections-in-seasons samples)))
 
