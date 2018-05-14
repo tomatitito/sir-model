@@ -1,5 +1,5 @@
 (ns sir-model.two-stage-poisson
-  (:require [anglican-code.distributions :as d]
+  (:require [sir-model.distributions :as d]
             [sir-model.dataflow :as flow]
             [sir-model.framework :as fw])
   (:use [anglican [core :exclude [-main]] runtime emit]))

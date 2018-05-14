@@ -1,4 +1,4 @@
-(ns anglican-code.distributions
+(ns sir-model.distributions
   (:use [anglican core emit runtime]))
 
 (defn geometric-recursion [p acc]
@@ -111,4 +111,4 @@
               (observe (fast-poisson lambda) 1000)
               {:x x})))
 
-(take 1 (doquery :lmh fast [40]))
+;(take 1 (doquery :lmh fast [40]))
