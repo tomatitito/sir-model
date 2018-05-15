@@ -1,6 +1,5 @@
 (ns sir-model.framework
-  (:require [sir-model.util :as u]
-            [sir-model.dataflow :as flow])
+  (:require [sir-model.dataflow :as flow])
   (:use [anglican emit runtime [core :exclude [-main]]]))
 
 
@@ -9,7 +8,7 @@
   [flow/S->]
   (defm infect
         "Infections for time t. Infecting individuals from who infect new individuals as specified by how (must be a
-        function). Returns updated-coll."
+        function). Newly infected individuals are subtracted from :S department. Returns updated-coll."
         [t who whom how coll]
         (let
           [max-cases (get-in coll [t :S])

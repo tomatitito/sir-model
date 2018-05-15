@@ -1,5 +1,6 @@
 (ns sir-model.two-stage-poisson-test
   (require [sir-model.two-stage-poisson :as model]
+           [sir-model.framework :as fw]
            [sir-model.dataflow :as flow]
            [util.functions :as u]
            [clojure.test :as t])
@@ -10,7 +11,7 @@
 (defn sum-compartments
   "Sum specified compartments of an sir-record. Compartments have to be given as coll.
   Used to check, if e.g. the [:I :R] compartments sum to the same number over the course
-  of a progression, as they should."
+  of a cohort lifetime, as they should."
   ([sir-record comps]
    (sum-compartments sir-record 0 comps))
   ([sir-record acc comps]
@@ -41,7 +42,7 @@
 (with-primitive-procedures
   [flow/create-args-coll]
   (defquery
-    test-query [args lifetime-fn]
+    test-query [args]
     (let
       [compartments (create-args-coll (:t-max args) (:compartments args) (:inits args))
        r-1 (sample (:prior-1 args))
@@ -51,7 +52,7 @@
        initial-only (model/progress 1 (get-in compartments [0 :I]) compartments)
 
        ;; lifetime-fn for simulation
-       f #(lifetime-fn %1 r-1 r-2 %2)
+       f #(model/cohort-lifetime %1 r-1 r-2 %2 args)
        season (fw/season-fn 0 compartments f)]
 
       {:initial-only initial-only :season season})))
@@ -59,12 +60,12 @@
 
 (t/deftest inital-I-only
          (let
-           [initial-only (u/from-result (first (doquery :lmh test-query [args model/form-and-prog])) [:initial-only])]
+           [initial-only (u/from-result (first (doquery :lmh test-query [args])) [:initial-only])]
            (t/testing
              (t/is (compare-sums-over-time initial-only [:S :I :R])))))
 
 (t/deftest simulation-run
   (let
-    [season (u/from-result (first (doquery :lmh test-query [args model/form-and-prog])) [:season])]
+    [season (u/from-result (first (doquery :lmh test-query [args])) [:season])]
     (t/testing
       (t/is (compare-sums-over-time season [:S :I :R :primary :secondary])))))

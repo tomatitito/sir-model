@@ -59,7 +59,7 @@
 
 
 (defm start-poisson-poisson
-      "Starts a cohort in two phases. First phase uses primary-poisson, second phase uses secondary-poisson. Is really
+      "Start a cohort in two phases. First phase uses primary-poisson, second phase uses secondary-poisson. Is really
       just a convenience wrapper around those functions."
       [t l-1 l-2 coll]
       ((comp
@@ -69,31 +69,45 @@
         coll))
 
 
-(with-primitive-procedures
-  [flow/update-rules flow/->compartments]
-  (defm progress
-        [t cases coll]
+(defm update-in-ang
+  "'Updates' a value in a nested associative structure, where ks is a
+  sequence of keys and f is a function that will take the old value
+  and any supplied args and return the new value, and returns a new
+  nested structure.  If any levels do not exist, hash-maps will be
+  created."
+  [m ks f & args]
+  (let [up (fn up [m ks f args]
+             (let [[k & ks] ks]
+               (if ks
+                 (assoc m k (up (get m k) ks f args))
+                 (assoc m k (apply f (get m k) args)))))]
+    (up m ks f args)))
 
-        (if (= t (count coll))
-          ;; if time's up, remaining cases
-          ;; are discarded
-          coll
 
-          (let
-            [removed (sample (binomial cases 0.45))
-             remaining (- cases removed)
+(defm progress
+  [t cases coll]
 
-             ;; update-rules returns a vector that has all
-             ;; information about how coll is updated
-             where-and-what (update-rules t cases removed)
+  (if (= t (count coll))
+    ;; if time's up, remaining cases
+    ;; are discarded
+    coll
 
-             ;; in addition to removed and remaining cases,
-             ;; the number of susceptibles must be retained
-             ;; throughout the progression
-             updated-1 (->compartments where-and-what coll)
-             updated-coll (assoc-in updated-1 [t :S] (get-in updated-1 [(dec t) :S]))]
+    (let
+      [removed (sample (binomial cases 0.45))
+       remaining (- cases removed)
+       susceptible (get-in coll [(dec t) :S])
 
-            (progress (inc t) remaining updated-coll)))))
+       ;; during progression a number of things need to happen at each timestep
+       ;; some individuals recover, their number has to be added to [t :R]
+       ;; the rest remains infected, this number has to be added to [t :I]
+       ;; the number of susceptibles has to be copied from (dec t) to t
+       updated-coll (assoc-in
+                      (update-in-ang
+                        (update-in-ang coll [t :R] + removed)
+                        [t :I] + remaining)
+                      [t :S] susceptible)]
+
+      (progress (inc t) remaining updated-coll))))
 
 
 (defm init-compartments
@@ -108,7 +122,7 @@
 (with-primitive-procedures
   [flow/cohort-size]
   (defm start-and-progress
-        "Simulating the lifetime of a cohort including formation and progression."
+        "Simulate formation and progression of a cohort."
         [t l-1 l-2 coll]
         ((comp
            #(progress (inc t) (cohort-size t %) %)
@@ -146,22 +160,27 @@
 (with-primitive-procedures
   [new-cases-dist]
   (defm cohort-lifetime
-        [t l-1 l-2 coll args]
+    "Represent a cohort through its entire lifetime. Take care of start and progress and,
+    if data is available, of observing the parameters. This function needs to be passed to
+    the season-fn to be recursively called for as many timesteps as needed."
+    [t l-1 l-2 coll args]
+    (let
+      [updated-coll (start-and-progress t l-1 l-2 coll)]
+
+      (when (and
+              (:data args) (< t (count (:data args))))
         (let
-          [updated-coll (start-and-progress t l-1 l-2 coll)]
+          [n-primary (get-in coll [t :primary])
+           n-secondary (get-in coll [t :secondary])
+           ;; estimating the proportion of new primary and secondary cases
+           [cases-primary cases-secondary] (split-observed t l-1 l-2 coll args)]
 
-          (when (and
-                  (:data args) (< t (count (:data args))))
-            (let
-              [n-primary (get-in coll [t :primary])
-               n-secondary (get-in coll [t :secondary])
-               ;; estimating the proportion of new primary and secondary cases
-               [cases-primary cases-secondary] (split-observed t l-1 l-2 coll args)]
-
-              (observe (new-cases-dist n-primary l-1) cases-primary)
-              (observe (new-cases-dist n-secondary l-2) cases-secondary)
-              ))
-          updated-coll)))
+          ;(observe (new-cases-dist n-primary l-1) cases-primary)
+          ;(observe (new-cases-dist n-secondary l-2) cases-secondary)
+          ;; observe the sum of poisson distributed variables
+          (observe (new-cases-dist (+ (* l-1 n-primary) (* l-2 n-secondary))))
+          ))
+      updated-coll)))
 
 
 (with-primitive-procedures
