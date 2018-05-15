@@ -7,16 +7,28 @@
 
 
 (defdist new-cases-dist
-         [N lambda]
-         [*lambda (* N lambda)]
-         (sample* [this]
-                  (if (> *lambda 30)
-                    (sample* (d/fast-poisson *lambda))
-                    (sample* (poisson *lambda))))
-         (observe* [this value]
-                   (if (pos? N)
-                     (observe* (poisson *lambda) value)
-                     0)))
+  [N lambda]
+  [*lambda (* N lambda)]
+  (sample* [this]
+           (if (> *lambda 30)
+             (sample* (d/fast-poisson *lambda))
+             (sample* (poisson *lambda))))
+  (observe* [this value]
+            (if (pos? N)
+              (observe* (poisson *lambda) value)
+              0)))
+
+(defdist two-stage-poisson-dist
+  "Wrapper around fast-poisson and new-cases-dist. Used for observing with primary and secondary cases."
+  [N-1 l-1 N-2 l-2]
+  [*l-1 (* N-1 l-1)
+   *l-2 (* N-2 l-2)
+   *lambda (+ *l-1 *l-2)]
+  (sample* [this] (sample* (new-cases-dist 1 *lambda)))
+  (observe* [this value]
+            (if (pos? *lambda)
+              (observe* (poisson *lambda) value)
+              0)))
 
 
 (with-primitive-procedures
@@ -128,6 +140,15 @@
            #(progress (inc t) (cohort-size t %) %)
            #(start-poisson-poisson t l-1 l-2 %))
           coll)))
+
+
+;(defm start-observe-progress
+;  "In case data is available, observe on it after start and before
+;  progression of a cohort."
+;  [t l-1 l-2 coll datapoint]
+;  (let [primary (generate-poisson (get-in coll [t :I]) l-1)
+;        secondary (generate-poisson primary l-2)]
+;    (observe (new-cases-dist ()))))
 
 
 (defm split-observed
