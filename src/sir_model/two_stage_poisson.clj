@@ -198,23 +198,10 @@
     if data is available, of observing the parameters. This function needs to be passed to
     the season-fn to be recursively called for as many timesteps as needed."
     [t l-1 l-2 coll args]
-    (let
-      [updated-coll (start-and-progress t l-1 l-2 coll)]
-
-      (when (and
-              (:data args) (< t (count (:data args))))
-        (let
-          [n-primary (get-in coll [t :primary])
-           n-secondary (get-in coll [t :secondary])
-           ;; estimating the proportion of new primary and secondary cases
-           [cases-primary cases-secondary] (split-observed t l-1 l-2 coll args)]
-
-          ;(observe (new-cases-dist n-primary l-1) cases-primary)
-          ;(observe (new-cases-dist n-secondary l-2) cases-secondary)
-          ;; observe the sum of poisson distributed variables
-          (observe (new-cases-dist (+ (* l-1 n-primary) (* l-2 n-secondary))))
-          ))
-      updated-coll)))
+    (if (and
+          (:data args) (< t (count (:data args))))
+      (start-observe-progress t l-1 l-2 coll (get (:data args) t))
+      (start-and-progress t l-1 l-2 coll))))
 
 
 (with-primitive-procedures
