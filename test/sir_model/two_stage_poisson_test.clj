@@ -3,7 +3,7 @@
            [sir-model.framework :as fw]
            [sir-model.dataflow :as flow]
            [util.functions :as u]
-           [clojure.test :as t])
+           [clojure.test :refer [deftest is testing]])
   (:use
     [anglican [core :exclude [-main]] runtime emit]))
 
@@ -58,14 +58,14 @@
       {:initial-only initial-only :season season})))
 
 
-(t/deftest inital-I-only
+(deftest inital-I-only
          (let
            [initial-only (u/from-result (first (doquery :lmh test-query [args])) [:initial-only])]
-           (t/testing
-             (t/is (compare-sums-over-time initial-only [:S :I :R])))))
+           (testing
+             (is (compare-sums-over-time initial-only [:S :I :R])))))
 
-(t/deftest simulation-run
+(deftest simulation-run
   (let
     [season (u/from-result (first (doquery :lmh test-query [args])) [:season])]
-    (t/testing
-      (t/is (compare-sums-over-time season [:S :I :R :primary :secondary])))))
+    (testing
+      (is (compare-sums-over-time season [:S :I :R :primary :secondary])))))
