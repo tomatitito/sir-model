@@ -142,22 +142,14 @@
           coll)))
 
 
-;(defm start-observe-progress
-;  "In case data is available, observe on it after start and before
-;  progression of a cohort."
-;  [t l-1 l-2 coll datapoint]
-;  (let [primary (generate-poisson (get-in coll [t :I]) l-1)
-;        secondary (generate-poisson primary l-2)]
-;    (observe (new-cases-dist ()))))
-
-
 (defm split-observed
       "Split number of observed cases according to ratio of primary and secondary cases
       combined with parameters l-1 and l-2. Returns a vector with numbers for estimated
       primary and secondary observed cases."
-      [t l-1 l-2 coll args]
+      [t l-1 l-2 coll datapoint]
       (let
-        [n-total (get (:data args) t)
+        [n-total datapoint
+         ;n-total (get (:data args) t)
          n-primary (get-in coll [t :primary])
          n-secondary (get-in coll [t :secondary])]
 
@@ -176,6 +168,27 @@
                    obs-2 (* ratio n-total)
                    obs-1 (- n-total obs-2)]
                   [obs-1 obs-2]))))
+
+
+(with-primitive-procedures [two-stage-poisson-dist flow/cohort-size]
+  (defm start-observe-progress
+    "In case data is available, observe on it after start and before
+    progression of a cohort."
+    [t l-1 l-2 coll datapoint]
+    (let
+      [
+       ;; starting a new cohort
+       coll-before-observe (start-poisson-poisson t l-1 l-2 coll)
+       ;; splitting observed in primary and secondary and observe
+       [primary secondary] (split-observed t l-1 l-2 coll datapoint)
+       _ (observe (two-stage-poisson-dist primary l-1 secondary l-2) datapoint)
+       ;; reinject observed and splitted into coll
+       coll-after-observe (assoc-in
+                            (assoc-in coll-before-observe [t :primary] primary)
+                            [t :secondary] secondary)
+       ]
+      ;; and start the progression
+      (progress (inc t) (cohort-size t coll-after-observe) coll-after-observe))))
 
 
 (with-primitive-procedures
