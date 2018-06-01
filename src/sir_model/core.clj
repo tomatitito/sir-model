@@ -6,7 +6,8 @@
             [sir-model.two-stage-poisson :as model]
             [com.climate.claypoole :as cp]
             [oz.core :as oz])
-  (:use [anglican [core :exclude [-main]] runtime emit stat]))
+  (:use [anglican [core :exclude [-main]] runtime emit stat])
+  (:import (java.util Arrays)))
 
 
 (def arg-map
@@ -86,4 +87,23 @@
       samples (sampler model/two-stage-poisson-query arg-map n-runs)]
   (dashboard samples))
 
+
+(defn hdi [samples cred-mass]
+  "Compute highest density interval for probability distribution represented by samples. Algorithm is
+  adopted from Kruschke, J.K. (2015)."
+  (let [sorted (sort samples)
+        ;;number of samples needed with given cred-mass
+        n-keep (int (Math/floor (* cred-mass (count sorted))))
+        ;;how many CIs to compare
+        n-CIs (- (count sorted) n-keep)
+        ;;computing widths for the different CIs
+        ci-width (reduce #(conj %1 (- (nth sorted (+ %2 n-keep)) (nth sorted %2))) [] (range n-CIs))
+        ;;keep the narrowest width
+        min-width (apply min ci-width)
+        ;;locate index of min-width
+        ind-of-min (.indexOf ci-width min-width)
+        ;;get hdi borders
+        borders [(nth sorted ind-of-min) (nth sorted (+ ind-of-min n-keep))]
+        ]
+    borders))
 
