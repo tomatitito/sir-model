@@ -18,7 +18,7 @@
    :prior-2      (uniform-continuous 0.8 1.2)
    :n-samples    10
    :n-thin        1
-   :data         [5 20 100 120 200 100 300 700 1000 1400 1700 1600 1500 100 600 300 200 100 50 20 10 5 4]
+   ;:data         [5 20 100 120 200 100 300 700 1000 1400 1700 1600 1500 100 600 300 200 100 50 20 10 5 4]
    })
 
 
@@ -82,10 +82,8 @@
 
     (oz/v! board)))
 
-
 ;(let [n-runs 5000
 ;      samples (sampler model/two-stage-poisson-query arg-map n-runs)]
 ;  (dashboard samples))
-;(def samples (sampler model/two-stage-poisson-query arg-map 10))
-
+;(def samples (sampler model/two-stage-poisson-query arg-map 1000))
 

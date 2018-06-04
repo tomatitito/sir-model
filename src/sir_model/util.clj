@@ -207,14 +207,19 @@
               :y {:aggregate "count"
                   :type "quantitative"}}})
 
+(declare hdi-plot-spec)
 
 (defn new-infections-plot-spec
-  "Create spec to plot weekly new infections using vega-lite."
-  [samples]
-  {:data     {:values (vec->vega-time-series (new-infections-in-seasons samples))}
-   :mark     {:type "tick" :opacity 0.3}
-   :encoding {:x {:field :week :type "ordinal"}
-              :y {:field :data :type "quantitative"}}})
+  "Create spec to plot weekly new infections using vega-lite. If cred-mass is supplied, a laayer with
+  highest density intervals (one for each week) is added to the plot."
+  ([samples]
+   {:data     {:values (vec->vega-time-series (new-infections-in-seasons samples))}
+    :mark     {:type "tick" :opacity 0.3}
+    :encoding {:x {:field :week :type "ordinal"}
+               :y {:field :data :type "quantitative"}}})
+  ([samples cred-mass]
+   {:layer [(new-infections-plot-spec samples)
+            (hdi-plot-spec samples cred-mass)]}))
 
 
 (defn hdi [samples-from-dist cred-mass]
@@ -266,6 +271,6 @@
   [samples cred-mass]
   (let [borders (samples->hdi-borders samples cred-mass)]
     {:data     {:values (borders->vega-lite borders)}
-     :mark     {:type "bar" :opacity 0.3}
+     :mark     {:type "bar" :opacity 0.3 :color "green"}
      :encoding {:x {:field :week :type "ordinal"}
                 :y {:field :data :type "quantitative"}}}))
