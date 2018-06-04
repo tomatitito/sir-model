@@ -86,22 +86,16 @@
 ;(let [n-runs 5000
 ;      samples (sampler model/two-stage-poisson-query arg-map n-runs)]
 ;  (dashboard samples))
-(def samples (sampler model/two-stage-poisson-query arg-map 10))
-(def new (util/new-infections-in-seasons samples))
-(util/vec->vega-time-series new)
-(util/vec->vega-time-series (util/new-infections-in-seasons samples))
+;(def samples (sampler model/two-stage-poisson-query arg-map 10))
 
 (defn samples->weekly-new
   "Takes samples and returns a seq of vectors holding weekly numbers of
   newly infected individuals"
-  [samples arg-map]
-  (let [n (count samples)
-        step (get arg-map :t-max)]
-    (->> samples
-        (util/new-infections-in-seasons)
-        (apply map vector))))
+  [samples]
+  (->> samples
+       (util/new-infections-in-seasons)
+       (apply map vector)))
 
-(samples->weekly-new samples arg-map)
 
 
 
