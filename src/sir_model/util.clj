@@ -245,6 +245,8 @@
 
 
 (defn borders->vega-lite
+  "Takes a nested seq of vectors of length two, holding the low and high border of the hdi. Returns
+  a seq of maps with keys representing week numbers and values representing the borders."
   [borders]
   (let [lo (map first borders)
         hi (map second borders)]
