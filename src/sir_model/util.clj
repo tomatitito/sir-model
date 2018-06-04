@@ -138,23 +138,13 @@
       {:week t :data v})))
 
 
-(defn vec->vega-time-series
-  "Converts a vector of values. Returns a vector of maps, which have two key-value pairs,
-  one for :week and one for :data (cases). This format can be supplied as a values vector
-  for vega-lite."
+(defn vecs->time-series
+  "Converts a nested vector or seq of values. Wrapper around vec->time-series."
   [vec]
-  (letfn [(vec->series
-            [v]
-            (let [steps (range (count v))
-                  steps-and-vals (zipmap steps v)]
-              (for [[t v] steps-and-vals]
-                {:week t :data v}))
-            )
-          ]
-    (flatten
-      (map
-        #(vec->series %)
-        vec))))
+  (flatten
+    (map
+      #(vec->time-series %)
+      vec)))
 
 
 (defn extract-for-vega
@@ -163,7 +153,7 @@
   [samples kw]
   (->
     (from-seasons samples kw)
-    (vec->vega-time-series)))
+    (vecs->time-series)))
 
 
 (defn weekly-plot-spec
@@ -182,7 +172,7 @@
   "Takes anglican samples and returns only those for specified week."
   [samples week]
   (let
-    [seasons-by-week (vec->vega-time-series (from-results samples [:season]))
+    [seasons-by-week (vecs->time-series (from-results samples [:season]))
      week-only (filter #(= week (get % :week)) seasons-by-week)]
     week-only))
 
