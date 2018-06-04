@@ -125,3 +125,10 @@
   (let [weekly (samples->weekly-new samples arg-map)]
     (map #(hdi % cred-mass) weekly)))
 
+
+(defn borders->vega-lite
+  [borders]
+  (let [lo (map first borders)
+        hi (map second borders)]
+    (into (util/vec->time-series lo) (util/vec->time-series hi))))
+
