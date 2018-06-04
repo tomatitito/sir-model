@@ -128,6 +128,16 @@
       (csv/write-csv writer (csv-data samples)))))
 
 
+(defn vec->time-series
+  "Converts a vector of values. Returns a seq of maps with two key-value-pairs each,
+  one for :week and one for :data. This format is useful for plotting with vega-lite."
+  [v]
+  (let [steps (range (count v))
+        steps-and-vals (zipmap steps v)]
+    (for [[t v] steps-and-vals]
+      {:week t :data v})))
+
+
 (defn vec->vega-time-series
   "Converts a vector of values. Returns a vector of maps, which have two key-value pairs,
   one for :week and one for :data (cases). This format can be supplied as a values vector
