@@ -88,47 +88,4 @@
 ;  (dashboard samples))
 ;(def samples (sampler model/two-stage-poisson-query arg-map 10))
 
-(defn samples->weekly-new
-  "Takes samples and returns a seq of vectors holding weekly numbers of
-  newly infected individuals"
-  [samples]
-  (->> samples
-       (util/new-infections-in-seasons)
-       (apply map vector)))
-
-
-
-
-(defn hdi [samples cred-mass]
-  "Compute highest density interval for probability distribution represented by samples. Algorithm is
-  adopted from Kruschke, J.K. (2015)."
-  (let [sorted (sort samples)
-        ;;number of samples needed with given cred-mass
-        n-keep (int (Math/floor (* cred-mass (count sorted))))
-        ;;how many CIs to compare
-        n-CIs (- (count sorted) n-keep)
-        ;;computing widths for the different CIs
-        ci-width (reduce #(conj %1 (- (nth sorted (+ %2 n-keep)) (nth sorted %2))) [] (range n-CIs))
-        ;;keep the narrowest width
-        min-width (apply min ci-width)
-        ;;locate index of min-width
-        ind-of-min (.indexOf ci-width min-width)
-        ;;get hdi borders
-        borders [(nth sorted ind-of-min) (nth sorted (+ ind-of-min n-keep))]
-        ]
-    borders))
-
-
-(defn samples->hdi-borders
-  "Compute highest density interval borders for samples as returned by anglican. Wrapper around hdi."
-  [samples cred-mass]
-  (let [weekly (samples->weekly-new samples arg-map)]
-    (map #(hdi % cred-mass) weekly)))
-
-
-(defn borders->vega-lite
-  [borders]
-  (let [lo (map first borders)
-        hi (map second borders)]
-    (into (util/vec->time-series lo) (util/vec->time-series hi))))
 
