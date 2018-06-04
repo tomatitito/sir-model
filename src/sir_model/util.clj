@@ -216,7 +216,8 @@
    {:data     {:values (vec->vega-time-series (new-infections-in-seasons samples))}
     :mark     {:type "tick" :opacity 0.3}
     :encoding {:x {:field :week :type "ordinal"}
-               :y {:field :data :type "quantitative"}}})
+               :y {:field :data :type "quantitative"
+                   :axis  {:title "new infections"}}}})
   ([samples cred-mass]
    {:layer [(new-infections-plot-spec samples)
             (hdi-plot-spec samples cred-mass)]}))
