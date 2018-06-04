@@ -240,7 +240,7 @@
 (defn samples->hdi-borders
   "Compute highest density interval borders for samples as returned by anglican. Wrapper around hdi."
   [samples cred-mass]
-  (let [weekly (samples->weekly-new samples arg-map)]
+  (let [weekly (samples->weekly-new samples)]
     (map #(hdi % cred-mass) weekly)))
 
 
@@ -251,3 +251,12 @@
   (let [lo (map first borders)
         hi (map second borders)]
     (into (vec->time-series lo) (vec->time-series hi))))
+
+
+(defn hdi-plot-spec
+  [samples cred-mass]
+  (let [borders (samples->hdi-borders samples cred-mass)]
+    {:data     {:values (borders->vega-lite borders)}
+     :mark     {:type "bar" :opacity 0.3}
+     :encoding {:x {:field :week :type "ordinal"}
+                :y {:field :data :type "quantitative"}}}))
