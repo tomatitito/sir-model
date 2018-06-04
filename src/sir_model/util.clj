@@ -217,11 +217,11 @@
        (apply map vector)))
 
 
-(defn hdi [samples cred-mass]
-  "Compute highest density interval for probability distribution represented by samples. Algorithm is
-  adopted from Kruschke, J.K. (2015)."
-  (let [sorted (sort samples)
-        ;;number of samples needed with given cred-mass
+(defn hdi [samples-from-dist cred-mass]
+  "Compute highest density interval for probability distribution represented by samples-from-dist.
+  Algorithm is adopted from Kruschke, J.K. (2015)."
+  (let [sorted (sort samples-from-dist)
+        ;;number of samples-from-dist needed with given cred-mass
         n-keep (int (Math/floor (* cred-mass (count sorted))))
         ;;how many CIs to compare
         n-CIs (- (count sorted) n-keep)
