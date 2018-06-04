@@ -118,3 +118,10 @@
         ]
     borders))
 
+
+(defn samples->hdi-borders
+  "Compute highest density interval borders for samples as returned by anglican. Wrapper around hdi."
+  [samples cred-mass]
+  (let [weekly (samples->weekly-new samples arg-map)]
+    (map #(hdi % cred-mass) weekly)))
+
