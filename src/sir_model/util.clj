@@ -208,15 +208,6 @@
                   :type "quantitative"}}})
 
 
-(defn samples->weekly-new
-  "Takes samples and returns a seq of vectors holding weekly numbers of
-  newly infected individuals"
-  [samples]
-  (->> samples
-       (new-infections-in-seasons)
-       (apply map vector)))
-
-
 (defn hdi [samples-from-dist cred-mass]
   "Compute highest density interval for probability distribution represented by samples-from-dist.
   Algorithm is adopted from Kruschke, J.K. (2015)."
@@ -235,6 +226,15 @@
         borders [(nth sorted ind-of-min) (nth sorted (+ ind-of-min n-keep))]
         ]
     borders))
+
+
+(defn samples->weekly-new
+  "Takes samples and returns a seq of vectors holding weekly numbers of
+  newly infected individuals"
+  [samples]
+  (->> samples
+       (new-infections-in-seasons)
+       (apply map vector)))
 
 
 (defn samples->hdi-borders
