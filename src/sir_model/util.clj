@@ -208,6 +208,15 @@
                   :type "quantitative"}}})
 
 
+(defn new-infections-plot-spec
+  "Create spec to plot weekly new infections using vega-lite."
+  [samples]
+  {:data     {:values (vec->vega-time-series (new-infections-in-seasons samples))}
+   :mark     {:type "tick" :opacity 0.3}
+   :encoding {:x {:field :week :type "ordinal"}
+              :y {:field :data :type "quantitative"}}})
+
+
 (defn hdi [samples-from-dist cred-mass]
   "Compute highest density interval for probability distribution represented by samples-from-dist.
   Algorithm is adopted from Kruschke, J.K. (2015)."
