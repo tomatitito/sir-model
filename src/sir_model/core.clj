@@ -64,10 +64,7 @@
   (let
     [primary (util/weekly-plot-spec samples :primary)
      secondary (util/weekly-plot-spec samples :secondary)
-     new {:data     {:values (util/vec->vega-time-series (util/new-infections-in-seasons samples))}
-          :mark     "tick"
-          :encoding {:x {:field :week :type "ordinal"}
-                     :y {:field :data :type "quantitative"}}}
+     new (util/new-infections-plot-spec samples 0.95)
      lambda-1 (util/histo-spec (util/from-results samples :lambda-1))
      lambda-2 (util/histo-spec (util/from-results samples :lambda-2))
      weekly-dists {:data     {:values (util/vec->vega-time-series (util/new-infections-in-seasons samples))}
@@ -86,4 +83,5 @@
 ;      samples (sampler model/two-stage-poisson-query arg-map n-runs)]
 ;  (dashboard samples))
 ;(def samples (sampler model/two-stage-poisson-query arg-map 1000))
+(dashboard samples)
 
