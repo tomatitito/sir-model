@@ -213,7 +213,7 @@
   "Create spec to plot weekly new infections using vega-lite. If cred-mass is supplied, a laayer with
   highest density intervals (one for each week) is added to the plot."
   ([samples]
-   {:data     {:values (vec->vega-time-series (new-infections-in-seasons samples))}
+   {:data     {:values (vecs->time-series (new-infections-in-seasons samples))}
     :mark     {:type "tick" :opacity 0.3}
     :encoding {:x {:field :week :type "ordinal"}
                :y {:field :data :type "quantitative"
@@ -286,7 +286,7 @@
      new (new-infections-plot-spec samples 0.95)
      lambda-1 (histo-spec (from-results samples :lambda-1))
      lambda-2 (histo-spec (from-results samples :lambda-2))
-     weekly-dists {:data     {:values (vec->vega-time-series (new-infections-in-seasons samples))}
+     weekly-dists {:data     {:values (vecs->time-series (new-infections-in-seasons samples))}
                    :mark     "tick"
                    :encoding {:x {:field :data :type "quantitative"}
                               :y {:field :week :type "ordinal"}}}
