@@ -278,6 +278,14 @@
                 :y {:field :data :type "quantitative"}}}))
 
 
+(defn data-plot-spec
+  [data]
+  {:data     {:values (util/vec->time-series (:data arg-map))}
+   :mark     {:type "tick" :color "red"}
+   :encoding {:x {:field :week :type "ordinal"}
+              :y {:field :data :type "quantitative"}}})
+
+
 (defn dashboard-spec
   "Plot a dashboard-like view of different aspects of the simulation data."
   [samples]
