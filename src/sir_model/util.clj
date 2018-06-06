@@ -203,8 +203,7 @@
   [vals]
   {:data {:values vals}
    :mark "bar"
-   :encoding {:x {:bin true
-                  :field "data"
+   :encoding {:x {:field "data"
                   :type "quantitative"}
               :y {:aggregate "count"
                   :type "quantitative"}}})
