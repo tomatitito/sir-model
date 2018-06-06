@@ -184,7 +184,9 @@
         week-only (map #(nth % week) new-all)]
     {:data     {:values week-only}
      :mark     "bar"
-     :encoding {:x {:field "data" :type "quantitative" :bin {:maxbins 50}}
+     :encoding {:x {:field "data" :type "quantitative"
+                    ;:bin {:maxbins 50}
+                    }
                 :y {:aggregate "count" :type "quantitative"}}}))
 
 
@@ -280,7 +282,7 @@
 
 (defn data-plot-spec
   [data]
-  {:data     {:values (util/vec->time-series (:data arg-map))}
+  {:data     {:values (vec->time-series data)}
    :mark     {:type "tick" :color "red"}
    :encoding {:x {:field :week :type "ordinal"}
               :y {:field :data :type "quantitative"}}})
