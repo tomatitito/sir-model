@@ -290,21 +290,41 @@
 
 (defn dashboard-spec
   "Plot a dashboard-like view of different aspects of the simulation data."
-  [samples]
-  (let
-    [primary (weekly-plot-spec samples :primary)
-     secondary (weekly-plot-spec samples :secondary)
-     new (new-infections-plot-spec samples 0.95)
-     lambda-1 (histo-spec (from-results samples :lambda-1))
-     lambda-2 (histo-spec (from-results samples :lambda-2))
-     weekly-dists {:data     {:values (vecs->time-series (new-infections-in-seasons samples))}
-                   :mark     "tick"
-                   :encoding {:x {:field :data :type "quantitative"}
-                              :y {:field :week :type "ordinal"}}}
+  ([samples]
+   (let
+     [primary (weekly-plot-spec samples :primary)
+      secondary (weekly-plot-spec samples :secondary)
+      new (new-infections-plot-spec samples 0.95)
+      lambda-1 (histo-spec (from-results samples :lambda-1))
+      lambda-2 (histo-spec (from-results samples :lambda-2))
+      weekly-dists {:data     {:values (vecs->time-series (new-infections-in-seasons samples))}
+                    :mark     "tick"
+                    :encoding {:x {:field :data :type "quantitative"}
+                               :y {:field :week :type "ordinal"}}}
 
-     board {:hconcat
-            [{:vconcat [primary secondary new {:hconcat [lambda-1 lambda-2]}]}
-             weekly-dists]}
-     ]
-    board))
+      board {:hconcat
+             [{:vconcat [primary secondary new {:hconcat [lambda-1 lambda-2]}]}
+              weekly-dists]}
+      ]
+     board)
+    )
+  ([samples data]
+   (let
+     [primary (weekly-plot-spec samples :primary)
+      secondary (weekly-plot-spec samples :secondary)
+      new-and-data {:layer [(new-infections-plot-spec samples 0.95) (data-plot-spec data)]}
+      lambda-1 (histo-spec (from-results samples :lambda-1))
+      lambda-2 (histo-spec (from-results samples :lambda-2))
+      weekly-dists {:data     {:values (vecs->time-series (new-infections-in-seasons samples))}
+                    :mark     "tick"
+                    :encoding {:x {:field :data :type "quantitative"}
+                               :y {:field :week :type "ordinal"}}}
+
+      board {:hconcat
+             [{:vconcat [primary secondary new-and-data {:hconcat [lambda-1 lambda-2]}]}
+              weekly-dists]}
+      ]
+     board)
+
+    ))
 
