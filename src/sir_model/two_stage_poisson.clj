@@ -144,20 +144,24 @@
          coll)))
 
 
-(with-primitive-procedures [two-stage-poisson-dist flow/cohort-size flow/S->]
+(with-primitive-procedures [two-stage-poisson-dist flow/cohort-size flow/S-> flow/a->b]
   (defm start-observe-progress
     "In case data is available, observe on it after start and before
     progression of a cohort."
     [t l-1 l-2 coll datapoint]
     (let
-      [primary (generate-poisson datapoint l-1)
+      [
+       ;primary (generate-poisson datapoint l-1)
+       primary (sample (poisson (* datapoint l-1)))
        secondary (generate-poisson primary l-2)
 
        ;; updating coll
        ;; primary and secondary cases have to be subracted from :S
        ;; and added to :primary and :secondary
-       temp (S-> t :primary primary coll)
-       updated-coll (S-> t :secondary secondary temp)]
+       ;temp (S-> t :primary primary coll)
+       temp (a->b [t :S] [t :primary] primary coll)
+       ;updated-coll (S-> t :secondary secondary temp)
+       updated-coll (a->b [t :S] [t :secondary] secondary temp)]
 
       (if (zero? t)
         ;; start of simulation, no observing
