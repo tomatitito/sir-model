@@ -104,6 +104,12 @@
 
 
 (defn write-seasons!
+  "Takes output generated from anglican and writes data for seasons generated
+  by getter-fn to outfile. An additional header can be specified. getter-fn can
+  be a single function or a vector of functions, which can be used to simply
+  collect data from the output or to compute values based on them. Note that
+  these functions have to operate on a single sample, since they are called
+  recursively inside a loop."
   [samples getter-fn outfile & header]
   (letfn
     [(csv-data [samples]
@@ -126,6 +132,25 @@
       (when header
         (csv/write-csv writer header))
       (csv/write-csv writer (csv-data samples)))))
+
+
+(defn write-seasons-as-df!
+  "Write simulation results to be read in as dataframe and plotted by R.
+  Wraps around write-seasons!. outfile is given without file extension
+  and automatically stored as csv-file."
+  [samples outfile]
+  (let
+    [getter-fns [new-infections-in-season
+                 #(from-season % :S)
+                 #(from-season % :I)
+                 #(from-season % :R)
+                 #(from-season % :primary)
+                 #(from-season % :secondary)]
+     filedir "data"
+     path (str filedir "/" outfile ".csv")
+     header ["week" "new" "S" "I" "R" "primary" "secondary" "sim_id"]]
+
+    (write-seasons! samples getter-fns path header)))
 
 
 (defn vec->time-series
