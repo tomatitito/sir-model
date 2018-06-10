@@ -19,6 +19,7 @@ path <- args[1]
 # dat <- read.csv(path,colClasses="numeric",header=TRUE) %>% mutate(cases=new )
 
 dat <- read.csv(path,header=TRUE) %>% mutate(cases=new )
+emp_dat <- read.csv("data/empirical_data.csv", header=T)
 
 
 hdi = function( sampleVec , credMass=0.95 ) {
@@ -70,7 +71,7 @@ compute_stat = function(df, f){
 
 season_plot = function(sim_data, empirical_data=NULL){
   p = ggplot(data=sim_data, aes(x=week, y=cases)) +
-    geom_point(alpha=1/100) +
+    geom_point(alpha=1/500) +
     geom_ribbon(data=borders(sim_data), aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE)
   if (!is.null(empirical_data)){
     p = p + geom_point(data=empirical_data, aes(x=week, y=cases), color="red")
@@ -78,7 +79,7 @@ season_plot = function(sim_data, empirical_data=NULL){
   p
 }
 
-ggsave(file="plot-no-dat-04:09_10:18.pdf", plot=season_plot(dat), width=10, height=5)
+ggsave(file="plot-dat.pdf", plot=season_plot(dat, emp_dat), width=10, height=5)
 # p_stats <- ggplot(stats_long, aes(x=week,y=val, color=stat)) + geom_point(show.legend=FALSE) +
 #   facet_grid(stat ~ ., scales="free") +
 #   theme(axis.title.x=element_blank(), axis.title.y=element_blank())
