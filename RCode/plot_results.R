@@ -4,7 +4,7 @@ library(purrr)
 library(scales)
 library(tidyr)
 
-#args <- commandArgs(TRUE)
+args <- commandArgs(TRUE)
 
 ## NOTE: when naming cols or changing types 
 ##the way the data looks has changed
@@ -14,9 +14,11 @@ library(tidyr)
 ## week, new, S, I, R, primary, secondary, sim_id
 
 #path = "data/2018-01-31T22:37:09.770_two-stage-poisson-query_80000000_5000_1000.csv"
-#path <- args[1]
+path <- args[1]
 # dat <- read.csv(path,colClasses=c("numeric", "numeric","factor"),header=TRUE)
-dat <- read.csv(path,colClasses="numeric",header=TRUE) %>% mutate(cases=new )
+# dat <- read.csv(path,colClasses="numeric",header=TRUE) %>% mutate(cases=new )
+
+dat <- read.csv(path,header=TRUE) %>% mutate(cases=new )
 
 
 hdi = function( sampleVec , credMass=0.95 ) {
@@ -43,16 +45,11 @@ hdi = function( sampleVec , credMass=0.95 ) {
   return( HDIlim )
 }
 
-# borders <- dat %>%
-#   split(.$week) %>%
-#   map_df(~hdi( .$cases, 0.95)) %>%
-#   cbind(week=0:max(dat$week))
-
 borders = function(data){
   data %>%
     split(.$week) %>%
     map_df(~hdi( .$cases, 0.95)) %>%
-    cbind(week=0:max(dat$week))
+    cbind(week=0:max(data$week))
 }
 
 mode <- function(v) {
@@ -67,26 +64,21 @@ compute_stat = function(df, f){
     map_dbl(~f(.$new)) 
 }
 
-# layer data for aggregate statistics
-stats_wide = data.frame(week=0:39,means=compute_stat(dat, mean), medians=compute_stat(dat, median), modes=compute_stat(dat, mode))
-stats_long = gather(stats_wide, key=stat, value=val, means:modes)
+# # layer data for aggregate statistics
+# stats_wide = data.frame(week=0:39,means=compute_stat(dat, mean), medians=compute_stat(dat, median), modes=compute_stat(dat, mode))
+# stats_long = gather(stats_wide, key=stat, value=val, means:modes)
 
-# p_new <- ggplot(data=dat, aes(x=week, y=cases)) +
-#   geom_point(alpha=1/100) +
-#   geom_ribbon(data=borders, aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE) +
-#   scale_y_continuous(labels = comma) +
-#   labs(title="Simulierte Neuerkrankungen ueber 40 Wochen", x="Woche", y="Neuerkrankungen") +
-#   geom_line(data=stats_wide, aes(x=1:nrow(stats_wide),y=means, color="mean"), inherit.aes=FALSE) +
-#   geom_line(data=stats_wide, aes(x=1:nrow(stats_wide),y=medians, color="median"), inherit.aes=FALSE) +
-#   geom_line(data=stats_wide, aes(x=1:nrow(stats_wide),y=modes, color="mode"), inherit.aes=FALSE) +
-#   theme(legend.title=element_blank())
-
-season_plot = function(data){
-  ggplot(data=data, aes(x=week, y=cases)) +
+season_plot = function(sim_data, empirical_data=NULL){
+  p = ggplot(data=sim_data, aes(x=week, y=cases)) +
     geom_point(alpha=1/100) +
-    geom_ribbon(data=borders_f(data), aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE)
+    geom_ribbon(data=borders(sim_data), aes(week, ymin=lo, ymax=hi), fill="blue", alpha=1/10, inherit.aes=FALSE)
+  if (!is.null(empirical_data)){
+    p = p + geom_point(data=empirical_data, aes(x=week, y=cases), color="red")
+  }
+  p
 }
 
+ggsave(file="plot-no-dat-04:09_10:18.pdf", plot=season_plot(dat), width=10, height=5)
 # p_stats <- ggplot(stats_long, aes(x=week,y=val, color=stat)) + geom_point(show.legend=FALSE) +
 #   facet_grid(stat ~ ., scales="free") +
 #   theme(axis.title.x=element_blank(), axis.title.y=element_blank())
