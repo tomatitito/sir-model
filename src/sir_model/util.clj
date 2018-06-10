@@ -153,6 +153,19 @@
     (write-seasons! samples getter-fns path header)))
 
 
+(defn write-lambdas!
+  "Write l-1 and l-2 to csv."
+  [samples outfile]
+  (let [l-1 (from-results samples [:lambda-1])
+        l-2 (from-results samples [:lambda-2])
+        dat-out (->>
+                  (interleave l-1 l-2)
+                  (partition 2))]
+    (with-open [writer (io/writer outfile)]
+      (csv/write-csv writer [["lambda-1" "lambda-2"]])
+      (csv/write-csv writer dat-out))))
+
+
 (defn vec->time-series
   "Converts a vector of values. Returns a seq of maps with two key-value-pairs each,
   one for :week and one for :data. This format is useful for plotting with vega-lite."
