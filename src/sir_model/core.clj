@@ -22,6 +22,7 @@
    ;:data         [5 20 100 120 200 100 300 700 1000 1400 1700 1600 1500 1000 600 300 200 100 50 20 10 5 4]
    })
 
+(def data [5 20 100 120 200 100 300 700 1000 1400 1700 1600 1500 1000 600 300 200 100 50 20 10 5 4])
 
 (def counter (agent 0))
 (add-watch counter :watcher
@@ -38,8 +39,10 @@
 
 (defn lazy-samples
   "Takes an anglican query and returns samples as a lazy-seq."
-  [anglican-query args]
-  (doquery :ipmcmc anglican-query [args] :number-of-particles 1000))
+  ([anglican-query args n-particles]
+   (doquery :ipmcmc anglican-query [args] :number-of-particles n-particles))
+  ([anglican-query args]
+    (lazy-samples anglican-query args 1000)))
 
 
 (defn pmap-samples
@@ -54,10 +57,14 @@
 
 
 (defn sampler
-  [anglican-query args n]
-  (-> anglican-query
-      (lazy-samples args)
-      (pmap-samples n)))
+  ([anglican-query args n n-particles]
+   (-> anglican-query
+       (lazy-samples args n-particles)
+       (pmap-samples n)))
+  ([anglican-query args n]
+   (-> anglican-query
+       (lazy-samples args)
+       (pmap-samples n))))
 
 (defn write-lambda-priors!
   [args n outfile]
@@ -82,6 +89,9 @@
 ;(oz/v! (util/dashboard-spec samples (:data arg-map)))
 ;(oz/v! (util/dashboard-spec samples ))
 ;(oz/v! (util/week-histo-spec samples 7))
+(defn plot-results! [samples]
+  (oz/start-plot-server!)
+  (oz/v! (util/dashboard-spec samples)))
 
 (def cli-opts
   [["-n" "--n-samples n-samples" "Number of program runs for influenza season"
@@ -100,26 +110,32 @@
     :default 100
     :parse-fn #(Integer/parseInt %)]
    ["-o" "--outfile"]
+   ["-d" "--data"]
+   ["-g" "--plot-results"]
    ["-h" "--help"]])
 
-(defmacro if-let*
-  ([bindings then]
-   `(if-let* ~bindings ~then nil))
-  ([bindings then else]
-   (if (seq bindings)
-     `(if-let [~(first bindings) ~(second bindings)]
-        (if-let* ~(drop 2 bindings) ~then ~else)
-        ~else)
-     then)))
-
-;(util/write-seasons-as-df! samples "season-without-data-04:09_10:18")
 (defn -main [& args]
-  (let [parsed-opts (parse-opts args cli-opts) ]
-    (if-let* [n-samples (get-in parsed-opts [:options :n-samples])
-             n-susceptible (get-in parsed-opts [:options :n-susceptible])]
-      (println
-        (-> arg-map
-            (assoc-in [:n-samples] n-samples)
-            (assoc-in [:inits :S] n-susceptible))))
-    ))
+  (let [
+        ;; getting cli arguments
+        parsed-opts (parse-opts args cli-opts)
+        n-samples (get-in parsed-opts [:options :n-samples])
+        n-susceptible (get-in parsed-opts [:options :n-susceptible])
+        n-infected (get-in parsed-opts [:options :n-infected])
+        t-max (get-in parsed-opts [:options :t-max])
+        n-particles (get-in parsed-opts [:options :n-particles])
+
+        arguments (-> arg-map
+                      (assoc-in [:n-samples] n-samples)
+                      (assoc-in [:inits :S] n-susceptible)
+                      (assoc-in [:inits :I] n-infected)
+                      (assoc-in [:t-max] t-max))
+
+        ;; run model with or without data
+        samples (if (get-in parsed-opts [:options :data])
+                  (sampler model/two-stage-poisson-query (assoc-in arguments [:data] data) n-particles)
+                  (sampler model/two-stage-poisson-query arguments n-particles))
+        ]
+
+    (if-let [outfile (get-in parsed-opts [:arguments 0])]
+      (util/write-seasons-as-df! samples outfile))))
 
