@@ -6,8 +6,7 @@
             [sir-model.two-stage-poisson :as model]
             [com.climate.claypoole :as cp]
             [oz.core :as oz])
-  (:use [anglican [core :exclude [-main]] runtime emit stat])
-  (:import (java.util Arrays)))
+  (:use [anglican [core :exclude [-main]] runtime emit stat]))
 
 
 (def arg-map
@@ -59,9 +58,6 @@
       (pmap-samples n)))
 
 
-;(let [n-runs 5000
-;      samples (sampler model/two-stage-poisson-query arg-map n-runs)]
-;  (dashboard samples))
 ;(def samples (sampler model/two-stage-poisson-query arg-map 1000))
-(oz/v! (util/dashboard-spec samples))
+;(oz/v! (util/dashboard-spec samples))
 
