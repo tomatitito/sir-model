@@ -76,19 +76,9 @@
       (csv/write-csv writer [["l_1_prior" "l_2_prior"]])
       (csv/write-csv writer dat-out))))
 
-;(let [n-runs 5000
-;      samples (sampler model/two-stage-poisson-query arg-map n-runs)]
-;  (dashboard samples))
-;(def n-samples 10000)
-;(def samples (sampler model/two-stage-poisson-query arg-map n-samples))
 ;(util/write-lambdas! samples "lambdas.csv")
 ;(write-lambda-priors! arg-map n-samples "priors.csv")
-;(get-in (first samples) [:result :lambda-1])
-;(util/from-result (first samples) [:lambda-1])
-;(util/write-seasons! samples #(get-in % [:result :lambda-2]) "outtest.txt")
-;(oz/v! (util/dashboard-spec samples (:data arg-map)))
-;(oz/v! (util/dashboard-spec samples ))
-;(oz/v! (util/week-histo-spec samples 7))
+
 (defn plot-results! [samples]
   (oz/start-plot-server!)
   (oz/v! (util/dashboard-spec samples)))
