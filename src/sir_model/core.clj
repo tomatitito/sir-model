@@ -90,17 +90,36 @@
    ["-S" "--n-susceptible n-susceptible" "Population size"
     :default 100000
     :parse-fn #(Integer/parseInt %)]
+   ["-I" "--n-infected n-infected" "Number of initially infected individuals"
+    :default 2
+    :parse-fn #(Integer/parseInt %)]
    ["-t" "--t-max t-max" "Number of weeks for season"
     :default 40
     :parse-fn #(Integer/parseInt %)]
-   ["-p" "--n-particles" "Number of particles"
+   ["-p" "--n-particles n-particles" "Number of particles"
     :default 100
     :parse-fn #(Integer/parseInt %)]
    ["-o" "--outfile"]
    ["-h" "--help"]])
 
+(defmacro if-let*
+  ([bindings then]
+   `(if-let* ~bindings ~then nil))
+  ([bindings then else]
+   (if (seq bindings)
+     `(if-let [~(first bindings) ~(second bindings)]
+        (if-let* ~(drop 2 bindings) ~then ~else)
+        ~else)
+     then)))
+
 ;(util/write-seasons-as-df! samples "season-without-data-04:09_10:18")
 (defn -main [& args]
-  (let [parsed-opts (parse-opts args cli-opts)]
-    (println parsed-opts)))
+  (let [parsed-opts (parse-opts args cli-opts) ]
+    (if-let* [n-samples (get-in parsed-opts [:options :n-samples])
+             n-susceptible (get-in parsed-opts [:options :n-susceptible])]
+      (println
+        (-> arg-map
+            (assoc-in [:n-samples] n-samples)
+            (assoc-in [:inits :S] n-susceptible))))
+    ))
 
