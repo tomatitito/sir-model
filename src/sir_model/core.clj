@@ -42,7 +42,7 @@
   ([anglican-query args n-particles]
    (doquery :ipmcmc anglican-query [args] :number-of-particles n-particles))
   ([anglican-query args]
-    (lazy-samples anglican-query args 1000)))
+    (lazy-samples anglican-query args 100)))
 
 
 (defn pmap-samples
@@ -57,14 +57,14 @@
 
 
 (defn sampler
+  "Runs an anglican query and forces to results. This is just wrapper around
+  lazy-samples and pmap-samples."
   ([anglican-query args n n-particles]
    (-> anglican-query
        (lazy-samples args n-particles)
        (pmap-samples n)))
   ([anglican-query args n]
-   (-> anglican-query
-       (lazy-samples args)
-       (pmap-samples n))))
+    (sampler anglican-query args n 100)))
 
 (defn write-lambda-priors!
   [args n outfile]
@@ -85,7 +85,7 @@
 
 (def cli-opts
   [["-n" "--n-samples n-samples" "Number of program runs for influenza season"
-    :default 100
+    :default 1000
     :parse-fn #(Integer/parseInt %)]
    ["-S" "--n-susceptible n-susceptible" "Population size"
     :default 100000
@@ -99,14 +99,20 @@
    ["-p" "--n-particles n-particles" "Number of particles"
     :default 100
     :parse-fn #(Integer/parseInt %)]
-   ["-o" "--outfile"]
-   ["-d" "--data"]
+   ["-o" "--outfile"
+    :id :outfile
+    :required "Season samples are written to this file. File is automatically stored in data/."
+    ]
+   ["-l" "--lambda-outfile"
+    :id :lambda-outfile
+    :required "Estimated parameters are written to this file"]
+   ["-d" "--data" "Empirical data to condition on"]
    ["-g" "--plot-results"]
    ["-h" "--help"]])
 
 (defn -main [& args]
   (let [
-        ;; getting cli arguments
+        ;; get cli arguments
         parsed-opts (parse-opts args cli-opts)
         n-samples (get-in parsed-opts [:options :n-samples])
         n-susceptible (get-in parsed-opts [:options :n-susceptible])
@@ -114,6 +120,7 @@
         t-max (get-in parsed-opts [:options :t-max])
         n-particles (get-in parsed-opts [:options :n-particles])
 
+        ;; update arguments
         arguments (-> arg-map
                       (assoc-in [:n-samples] n-samples)
                       (assoc-in [:inits :S] n-susceptible)
@@ -122,10 +129,13 @@
 
         ;; run model with or without data
         samples (if (get-in parsed-opts [:options :data])
-                  (sampler model/two-stage-poisson-query (assoc-in arguments [:data] data) n-particles)
-                  (sampler model/two-stage-poisson-query arguments n-particles))
+                  (sampler model/two-stage-poisson-query (assoc-in arguments [:data] data) n-samples n-particles)
+                  (sampler model/two-stage-poisson-query arguments n-samples n-particles))
         ]
 
-    (if-let [outfile (get-in parsed-opts [:arguments 0])]
-      (util/write-seasons-as-df! samples outfile))))
+    (if-let [outfile (get-in parsed-opts [:options :outfile])]
+      (util/write-seasons-as-df! samples outfile))
+
+    (if-let [lambda-outfile (get-in parsed-opts [:options :lambda-outfile])]
+      (util/write-lambdas! samples lambda-outfile))))
 
