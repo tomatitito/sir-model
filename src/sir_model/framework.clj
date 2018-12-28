@@ -7,8 +7,9 @@
 (with-primitive-procedures
   [flow/S->]
   (defm infect
-        "Infections for time t. Infecting individuals from who infect new individuals as specified by how (must be a
-        function). Newly infected individuals are subtracted from :S department. Returns updated-coll."
+        "Infections for time t. Infecting individuals from who infect new
+        individuals as specified by how (must be a function). Newly infected
+        individuals are subtracted from :S department. Returns updated-coll."
         [t who whom how coll]
         (let
           [max-cases (get-in coll [t :S])
@@ -25,10 +26,11 @@
 (with-primitive-procedures
   [flow/cohort-size]
   (defm season-fn
-        "Generic function for simulating an influenza season. Takes a starting-timestep,
-        a collection of compartments and a lifetime-fn. timestep and collection are
-        arguments for lifetime-fn. This of course means that lifetime-fn has to be a
-        function that expects two arguments, the timestep and and collection."
+        "Generic function for simulating an influenza season. Takes a starting-
+        timestep, a collection of compartments and a lifetime-fn. timestep and
+        collection are arguments for lifetime-fn. This of course means that
+        lifetime-fn has to be a function that expects two arguments, the
+        timestep and and collection."
         [t coll lifetime-fn]
 
         (loop [t-cur t
