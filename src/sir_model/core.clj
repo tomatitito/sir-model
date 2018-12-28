@@ -40,7 +40,7 @@
 (defn lazy-samples
   "Takes an anglican query and returns samples as a lazy-seq."
   ([anglican-query args n-particles]
-   (doquery :ipmcmc anglican-query [args] :number-of-particles n-particles))
+   (doquery :smc anglican-query [args] :number-of-particles n-particles))
   ([anglican-query args]
     (lazy-samples anglican-query args 100)))
 
