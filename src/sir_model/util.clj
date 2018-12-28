@@ -64,9 +64,9 @@
 
 
 (defn sum-compartments
-  "Sum specified compartments of an sir-record. Compartments have to be given as coll.
-  Used to check, if e.g. the [:I :R] compartments sum to the same number over the course
-  of a progression, as they should."
+  "Sum specified compartments of an sir-record. Compartments have to be given
+  as coll. Used to check, if e.g. the [:I :R] compartments sum to the same
+  number over the course of a progression, as they should."
   ([sir-record comps]
    (sum-compartments sir-record 0 comps))
   ([sir-record acc comps]
@@ -167,8 +167,9 @@
 
 
 (defn vec->time-series
-  "Converts a vector of values. Returns a seq of maps with two key-value-pairs each,
-  one for :week and one for :data. This format is useful for plotting with vega-lite."
+  "Converts a vector of values. Returns a seq of maps with two key-value-pairs
+  each, one for :week and one for :data. This format is useful for plotting with
+  vega-lite."
   [v]
   (let [steps (range (count v))
         steps-and-vals (zipmap steps v)]
@@ -186,8 +187,9 @@
 
 
 (defn extract-for-vega
-  "Extracts data for kw from seasons in an anglican sample and converts to a format for
-  plotting with vega-lite. Works only for single values, not e.g. for seasons."
+  "Extracts data for kw from seasons in an anglican sample and converts to a
+  format for plotting with vega-lite. Works only for single values, not e.g.
+  for seasons."
   [samples kw]
   (->
     (from-seasons samples kw)
@@ -216,7 +218,8 @@
 
 
 (defn week-histo-spec
-  "Returns a spec for vega-lite to plot a histogram of new infections for a specified week."
+  "Returns a spec for vega-lite to plot a histogram of new infections for a
+  specified week."
   [samples week]
   (let [new-all (new-infections-in-seasons samples)
         week-only (map #(nth % week) new-all)]
@@ -251,8 +254,9 @@
 (declare hdi-plot-spec)
 
 (defn new-infections-plot-spec
-  "Create spec to plot weekly new infections using vega-lite. If cred-mass is supplied, a laayer with
-  highest density intervals (one for each week) is added to the plot."
+  "Create spec to plot weekly new infections using vega-lite. If cred-mass is
+  supplied, a laayer with highest density intervals (one for each week) is
+  added to the plot."
   ([samples]
    {:data     {:values (vecs->time-series (new-infections-in-seasons samples))}
     :mark     {:type "tick" :opacity 0.3}
@@ -265,8 +269,8 @@
 
 
 (defn hdi [samples-from-dist cred-mass]
-  "Compute highest density interval for probability distribution represented by samples-from-dist.
-  Algorithm is adopted from Kruschke, J.K. (2015)."
+  "Compute highest density interval for probability distribution represented by
+  samples-from-dist. Algorithm is adopted from Kruschke, J.K. (2015)."
   (let [sorted (sort samples-from-dist)
         ;;number of samples-from-dist needed with given cred-mass
         n-keep (int (Math/floor (* cred-mass (count sorted))))
@@ -294,15 +298,17 @@
 
 
 (defn samples->hdi-borders
-  "Compute highest density interval borders for samples as returned by anglican. Wrapper around hdi."
+  "Compute highest density interval borders for samples as returned by
+  anglican. Wrapper around hdi."
   [samples cred-mass]
   (let [weekly (samples->weekly-new samples)]
     (map #(hdi % cred-mass) weekly)))
 
 
 (defn borders->vega-lite
-  "Takes a nested seq of vectors of length two, holding the low and high border of the hdi. Returns
-  a seq of maps with keys representing week numbers and values representing the borders."
+  "Takes a nested seq of vectors of length two, holding the low and high border
+  of the hdi. Returns a seq of maps with keys representing week numbers and
+  values representing the borders."
   [borders]
   (let [lo (map first borders)
         hi (map second borders)]
