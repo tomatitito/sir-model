@@ -22,8 +22,11 @@
               0)))
 
 (defdist two-stage-poisson-dist
-  "Wrapper around fast-poisson and new-cases-dist. Used for observing with
-  primary and secondary cases."
+  "Custom distribution representing new cases in the two stage poisson model.
+  Expects number of primary and secondary cases and respective parameters as
+  inputs. sample returns a sample from this distribution. When given a number
+  of observed new infections, observe computes the log-likelihood of given the
+  number of infections. Wraps around fast-poisson and new-cases-dist."
   [N-1 l-1 N-2 l-2]
   [*l-1 (* N-1 l-1)
    *l-2 (* N-2 l-2)
