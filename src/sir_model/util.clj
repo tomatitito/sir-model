@@ -77,7 +77,8 @@
        (recur tail (+ sum (get sir-record head)))))))
 
 
-(defmulti #^{:private true} data-for-single-season (fn [query-result f sim-id] (sequential? f)))
+(defmulti #^{:private true} data-for-single-season
+          (fn [query-result f sim-id] (sequential? f)))
 
 (defmethod data-for-single-season false [query-result f sim-id]
   (let
@@ -341,7 +342,9 @@
       new (new-infections-plot-spec samples 0.95)
       lambda-1 (histo-spec (from-results samples :lambda-1))
       lambda-2 (histo-spec (from-results samples :lambda-2))
-      weekly-dists {:data     {:values (vecs->time-series (new-infections-in-seasons samples))}
+      weekly-dists {:data     {:values
+                               (vecs->time-series
+                                 (new-infections-in-seasons samples))}
                     :mark     "tick"
                     :encoding {:x {:field :data :type "quantitative"}
                                :y {:field :week :type "ordinal"}}}
@@ -356,19 +359,20 @@
    (let
      [primary (weekly-plot-spec samples :primary)
       secondary (weekly-plot-spec samples :secondary)
-      new-and-data {:layer [(new-infections-plot-spec samples 0.95) (data-plot-spec data)]}
+      new-and-data {:layer [(new-infections-plot-spec samples 0.95)
+                            (data-plot-spec data)]}
       lambda-1 (histo-spec (from-results samples :lambda-1))
       lambda-2 (histo-spec (from-results samples :lambda-2))
-      weekly-dists {:data     {:values (vecs->time-series (new-infections-in-seasons samples))}
+      weekly-dists {:data     {:values
+                               (vecs->time-series
+                                 (new-infections-in-seasons samples))}
                     :mark     "tick"
                     :encoding {:x {:field :data :type "quantitative"}
                                :y {:field :week :type "ordinal"}}}
 
       board {:hconcat
-             [{:vconcat [primary secondary new-and-data {:hconcat [lambda-1 lambda-2]}]}
+             [{:vconcat
+               [primary secondary new-and-data {:hconcat [lambda-1 lambda-2]}]}
               weekly-dists]}
       ]
-     board)
-
-    ))
-
+     board)))

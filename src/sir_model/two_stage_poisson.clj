@@ -176,7 +176,9 @@
         ;; and secondary cases from the previous timestep?
         (let [prev-primary (get-in updated-coll [(dec t) :primary])
               prev-secondary (get-in updated-coll [(dec t) :secondary])]
-          (observe (two-stage-poisson-dist prev-primary l-1 prev-secondary l-2) datapoint)
+          (observe
+            (two-stage-poisson-dist prev-primary l-1 prev-secondary l-2)
+            datapoint)
           (progress (inc t) (cohort-size t updated-coll) updated-coll))))))
 
 
@@ -201,7 +203,10 @@
     [args]
 
     (let
-      [compartments (create-args-coll (:t-max args) (:compartments args) (:inits args))
+      [compartments (create-args-coll
+                      (:t-max args)
+                      (:compartments args)
+                      (:inits args))
        initialized-comps (init-compartments compartments)
 
        lambda-1 (sample (:prior-1 args))

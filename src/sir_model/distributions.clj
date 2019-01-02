@@ -106,12 +106,3 @@
          (sample* [this]
                   (sample-fast-poisson lambda))
          (observe* [this value] (observe* (poisson lambda) value)))
-
-(with-primitive-procedures
-  [fast-poisson]
-  (defquery fast [lambda]
-            (let [x (sample (fast-poisson lambda))]
-              (observe (fast-poisson lambda) 1000)
-              {:x x})))
-
-;(take 1 (doquery :lmh fast [40]))

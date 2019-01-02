@@ -19,10 +19,12 @@
    :prior-2      (uniform-continuous 1.0 1.8)
    :n-samples    10
    :n-thin        1
-   ;:data         [5 20 100 120 200 100 300 700 1000 1400 1700 1600 1500 1000 600 300 200 100 50 20 10 5 4]
    })
 
-(def data [5 20 100 120 200 100 300 700 1000 1400 1700 1600 1500 1000 600 300 200 100 50 20 10 5 4])
+(def data
+  [5 20 100 120 200 100 300 700
+   1000 1400 1700 1600 1500 1000
+   600 300 200 100 50 20 10 5 4])
 
 (def counter (agent 0))
 (add-watch counter :watcher
@@ -101,7 +103,8 @@
     :parse-fn #(Integer/parseInt %)]
    ["-o" "--outfile"
     :id :outfile
-    :required "Season samples are written to this file. File is automatically stored in data/."
+    :required "Season samples are written to this file. File is automatically
+    stored in data/."
     ]
    ["-l" "--lambda-outfile"
     :id :lambda-outfile
@@ -129,8 +132,16 @@
 
         ;; run model with or without data
         samples (if (get-in parsed-opts [:options :data])
-                  (sampler model/two-stage-poisson-query (assoc-in arguments [:data] data) n-samples n-particles)
-                  (sampler model/two-stage-poisson-query arguments n-samples n-particles))
+                  (sampler
+                    model/two-stage-poisson-query
+                    (assoc-in arguments [:data] data)
+                    n-samples
+                    n-particles)
+                  (sampler
+                    model/two-stage-poisson-query
+                    arguments
+                    n-samples
+                    n-particles))
         ]
 
     (if-let [outfile (get-in parsed-opts [:options :outfile])]
