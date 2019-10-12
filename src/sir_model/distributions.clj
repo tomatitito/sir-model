@@ -18,21 +18,24 @@
 
 
 (defdist new-infections
-  "Distribution of new-infections. The number of new infections depends on the number of
-  already infected people. An infected individual transmits the disease to some number of
-  individuals. Parameters to this distribution are R0, the basic reproduction number and
-  the number of already infected individuals (prevalence). R0 is conceptualized as a geometric
-  random variable."
+  "Distribution of new-infections. The number of new infections depends on the
+  number of already infected people. An infected individual transmits the
+  disease to some number of individuals. Parameters to this distribution are R0,
+  the basic reproduction number and the number of already infected individuals
+  (prevalence). R0 is conceptualized as a geometric random variable."
   [R0 already-infected] []
   (sample* [this] (reduce + (repeatedly already-infected #(sample* (geometric (/ 1 R0))))))
   (observe* [this value] (observe* (reduce + (repeatedly already-infected #(geometric (/ 1 R0)))) value)))
 
 
-; In Anglican werden die Implementierungen zum Ziehen von Zufallszahlen aus einer gegebenen Verteilung des Apache
-; Commons Math Projekts verwendet. Im Fall der Poisson-Verteilung nimmt die dafür beanspruchte Zeit mit der Größe
-; des Parameter der Verteilung linear zu. Da dieser Parameter für das SIR-Modell proportional zur Größe der
-; betrachteten Population ist, führt sie zu sehr langen Programmlaufzeiten. Eine alternative Implementierung ist
-; daher wünschenswert. Im folgenden wird dazu ein Algorithmus implementiert, der von Atkinson (1979) beschrieben wurde.
+; In Anglican werden die Implementierungen zum Ziehen von Zufallszahlen aus einer
+; gegebenen Verteilung des Apache ; Commons Math Projekts verwendet. Im Fall der
+; Poisson-Verteilung nimmt die dafür beanspruchte Zeit mit der Größe des
+; Parameter der Verteilung linear zu. Da dieser Parameter für das SIR-Modell
+; proportional zur Größe der betrachteten Population ist, führt sie zu sehr
+; langen Programmlaufzeiten. Eine alternative Implementierung ist daher
+; wünschenswert. Im folgenden wird dazu ein Algorithmus implementiert, der von
+; Atkinson (1979) beschrieben wurde.
 
 (defn propose [lambda b a]
   (let
@@ -95,20 +98,11 @@
 
 
 (defdist fast-poisson
-         "This implementation uses an algorithm described by Atkinson (1979) to sample
-         from the poisson distribution. Runtime is independent of the size of lambda,
-         which is needed for the SIR-model."
+         "This implementation uses an algorithm described by Atkinson (1979)
+         to sample from the poisson distribution. Runtime is independent of the
+         size of lambda, which is needed for the SIR-model."
          [lambda]
          []
          (sample* [this]
                   (sample-fast-poisson lambda))
          (observe* [this value] (observe* (poisson lambda) value)))
-
-(with-primitive-procedures
-  [fast-poisson]
-  (defquery fast [lambda]
-            (let [x (sample (fast-poisson lambda))]
-              (observe (fast-poisson lambda) 1000)
-              {:x x})))
-
-;(take 1 (doquery :lmh fast [40]))
