@@ -1,4 +1,4 @@
-# sir-modell
+# An implementation of the SIR-Model using probabilistic programming
 
 FIXME: description
 
