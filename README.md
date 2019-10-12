@@ -1,16 +1,17 @@
 # An implementation of the SIR-Model using probabilistic programming
 
-FIXME: description
-
+This project implements the SIR-Model, widely used in epidemiology, in the probabilistic programming language Anglican.
 ## Installation
 
-Download from http://example.com/FIXME.
+https://github.com/tomatitito/sir-model
 
 ## Usage
 
-FIXME: explanation
+It should be possible to call like this: 
 
     $ java -jar sir-modell-0.1.0-standalone.jar [args]
+
+Because of this, you have to run `(-main)` from within a repl.
 
 ## Options
 
