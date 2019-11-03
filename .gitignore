@@ -16,3 +16,5 @@ pom.xml.asc
 *.csv
 *.pdf
 *.swo
+
+!plots/*small.pdf
