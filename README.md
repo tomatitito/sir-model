@@ -15,7 +15,7 @@ Because of this, you have to run `(-main)` from within a repl.
 
 ## Results
 
-A link to results of running the model without using emprical data can be seen ![here](https://github.com/tomatitito/sir-model/blob/master/plots/plot-nodat-04:09_10:18small.p). 
+![plot_dat](https://github.com/tomatitito/sir-model/blob/master/plots/plot-dat-04:09_10:18small.png)
 
 ## Options
 
