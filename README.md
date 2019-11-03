@@ -15,6 +15,9 @@ Because of this, you have to run `(-main)` from within a repl.
 
 ## Results
 
+Running the model 10000 times incorporating data from the 2015/16 influenca season yields the following results. 
+I have used 24 datapoints representing weekly new incfections. The data are provided by the *Robert-Koch-Institut (RKI)*.
+
 ![plot_dat](https://github.com/tomatitito/sir-model/blob/master/plots/plot-dat-04:09_10:18small.png)
 
 ## Options
