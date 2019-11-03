@@ -14,12 +14,12 @@ args <- commandArgs(TRUE)
 ## week, new, S, I, R, primary, secondary, sim_id
 
 #path = "data/2018-01-31T22:37:09.770_two-stage-poisson-query_80000000_5000_1000.csv"
-inpath <- args[1]
-outpath <- args[2]
+input_data_path <- args[1]
+output_image_path <- args[2]
 # dat <- read.csv(path,colClasses=c("numeric", "numeric","factor"),header=TRUE)
 # dat <- read.csv(path,colClasses="numeric",header=TRUE) %>% mutate(cases=new )
 
-dat <- read.csv(inpath,header=TRUE) %>% mutate(cases=new )
+dat <- read.csv(input_data_path,header=TRUE) %>% mutate(cases=new )
 emp_dat <- read.csv("data/empirical_data.csv", header=T)
 
 
@@ -80,7 +80,7 @@ season_plot = function(sim_data, empirical_data=NULL){
   p
 }
 
-ggsave(file=outpath, plot=season_plot(dat, emp_dat), width=10, height=5)
+ggsave(file=output_image_path, plot=season_plot(dat, emp_dat), width=10, height=5)
 # p_stats <- ggplot(stats_long, aes(x=week,y=val, color=stat)) + geom_point(show.legend=FALSE) +
 #   facet_grid(stat ~ ., scales="free") +
 #   theme(axis.title.x=element_blank(), axis.title.y=element_blank())
