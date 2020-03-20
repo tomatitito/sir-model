@@ -9,7 +9,9 @@
                  [org.clojure/tools.namespace "0.2.11"]
                  [org.clojure/tools.cli "0.4.1"]
                  [anglican "1.0.0"]
-                 [com.climate/claypoole "1.1.4"]]
+                 [com.climate/claypoole "1.1.4"]
+                 [javax.xml.bind/jaxb-api "2.4.0-b180830.0359"]
+                 ]
   :main sir-model.core
   :aot [sir-model.core]
   :target-path "target/%s"
